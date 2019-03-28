@@ -56,8 +56,8 @@ int main(int argc, char *argv[]) {
     char *input_file_name = argv[1];
     char *param_file_name = argv[2];
     
-    vector<Job> jobs = read_instance_file(input_file_name);
-    vector<int> params = read_param_file(param_file_name);
+    vector<Job> jobs = read_jobs_file(input_file_name);
+    vector<int> params = read_params_file(param_file_name);
 
     print_jobs(jobs);
 
