@@ -38,20 +38,3 @@ int calcula_S2(vector<vector<int>> f, int n, int r, vector<vector<int>> d) {
 	return s2;
 }
 
-int print_stack(stack<int> stack_jobs) {
-	vector<int> jobs;
-
-	while (!stack_jobs.empty()) {
-		int elem = stack_jobs.top();
-		stack_jobs.pop();
-		jobs.push_back(elem);
-	}
-
-	cout << "PERMUTA ";
-	for(int i = jobs.size() - 1; i >= 0; i--) {
-		cout << jobs[i] << " ";
-	}
-	cout << endl;
-
-	return 0;
-}
