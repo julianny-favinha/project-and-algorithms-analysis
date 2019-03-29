@@ -58,6 +58,10 @@ vector<int> read_params_file(char *name) {
     return items;
 }
 
+
+/*
+Calculates the sum of the end times of each job executed on machine 2
+*/
 void total_time(vector<Job> jobs, vector<int> order) {
 	int last_time_machine1 = 0;
 	int last_time_machine2 = 0;
