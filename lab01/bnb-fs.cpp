@@ -58,40 +58,41 @@ vector<int> read_params_file(char *name) {
     return items;
 }
 
-void total_time(vector<Job> jobs, vector<int> ordem) {
-	int ultimo_tempo_maq1 = 0;
-	int ultimo_tempo_maq2 = 0;
-	int soma = 0;
+void total_time(vector<Job> jobs, vector<int> order) {
+	int last_time_machine1 = 0;
+	int last_time_machine2 = 0;
+	int sum = 0;
 
-	for (int i = 0; i < ordem.size(); i++) {
-		ultimo_tempo_maq1 = ultimo_tempo_maq1 + jobs[ordem[i]].time1;
-		ultimo_tempo_maq2 = max(ultimo_tempo_maq2, ultimo_tempo_maq1) + jobs[ordem[i]].time2;
-		// cout << "maq1: " << ultimo_tempo_maq1 << ", maq2: " << ultimo_tempo_maq2 << endl;
-		soma += ultimo_tempo_maq2;
+	for (int i = 0; i < order.size(); i++) {
+		int machine = order[i];
+		last_time_machine1 = last_time_machine1 + jobs[machine].time1;
+		last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
+		sum += last_time_machine2;
+		cout << "m1: " << last_time_machine1 << ", m2: " << last_time_machine2 << ", sum: " << sum << endl;
 	}
 
-	cout << "Tempo na máquina 2: " << soma << endl;
+	cout << "Time elapsed @ machine 2: " << sum << endl;
 }
 
-void print_ordem(vector<int> ordem) {
-	cout << "Ordem: ";
-	for (int i = 0; i < ordem.size(); i ++) {
-		cout << ordem[i] + 1 << " ";
+void print_jobs_order(vector<int> order) {
+	cout << "Order: ";
+	for (int i = 0; i < order.size(); i ++) {
+		cout << order[i] + 1 << " ";
 	}
 
 	cout << endl;
 }
 
-void brute_force(vector<Job> jobs, vector<int> ordem, vector<int> used, int k, int n) {
+void brute_force(vector<Job> jobs, vector<int> order, vector<int> used, int k, int n) {
 	if (k == n) {
-		print_ordem(ordem);
-		total_time(jobs, ordem);
+		print_jobs_order(order);
+		total_time(jobs, order);
 	} else {
 		for (int i = 0; i < n; i ++) {
 			if (!used[i]) {
 				used[i] = 1;
-				ordem[k] = i;
-				brute_force(jobs, ordem, used, k+1, n);
+				order[k] = i;
+				brute_force(jobs, order, used, k+1, n);
 				used[i] = 0;
 			}
 		}
@@ -103,16 +104,15 @@ int main(int argc, char *argv[]) {
     char *param_file_name = argv[2];
 
     vector<Job> jobs = read_jobs_file(input_file_name);
-    // vector<int> params = read_params_file(param_file_name);
+    vector<int> params = read_params_file(param_file_name);
 
-    // cout << "JOBS";
-    // print_jobs(jobs);
+    cout << "Jobs: " << endl;
+    print_jobs(jobs);
 
     int n = jobs.size();
     vector<int> used(n, 0);
-    vector<int> ordem(n);
-
-    brute_force(jobs, ordem, used, 0, n);
+    vector<int> order(n);
+    brute_force(jobs, order, used, 0, n);
 
     return 0;
 };
