@@ -5,7 +5,6 @@
 #include <stack>
 #include <list>
 
-
 using namespace std;
 
 struct BestSolution {
@@ -31,13 +30,13 @@ int print_stack(stack<int> stack_jobs) {
 	return 0;
 }
 
-void print(list<int> const &list) {
-	for (auto it = list.cbegin(); it != list.cend(); it++) {
-		cout << *it << " ";
-	}
+// void print(list<int> const &list) {
+// 	for (auto it = list.cbegin(); it != list.cend(); it++) {
+// 		cout << *it << " ";
+// 	}
 
-	cout << endl;
-}
+// 	cout << endl;
+// }
 
 int main() {
 	// int n = 3;
@@ -92,14 +91,39 @@ int main() {
 	// cout << v[0] << endl;
 	// cout << u[0] << endl;
 
-	BestSolution solution = {list<int>(), -4};
+	// BestSolution solution = {list<int>(), -4};
 
-	solution.order.push_back(1);
-	solution.order.push_back(10);
+	// solution.order.push_back(1);
+	// solution.order.push_back(10);
 
-	print(solution.order);
+	// print(solution.order);
 
 	// cout << solution.sum << endl;
+
+	vector<int> linha1(3);
+	vector<int> linha2(3);
+
+	linha1[0] = 2;
+	linha1[1] = 3;	
+	linha1[2] = 2;
+
+
+	linha2[0] = 1;
+	linha2[1] = 1;	
+	linha2[2] = 3;
+
+	vector< vector<int> > matriz;
+
+	matriz.push_back(linha1);
+	matriz.push_back(linha2);
+
+	for (int i = 0; i < matriz.size(); i++) {
+		for (int j = 0; j < matriz[i].size(); j++) {
+			cout << matriz[i][j] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
 
 	return 0;
 }
