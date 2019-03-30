@@ -77,24 +77,46 @@ vector<int> final_times_m2(vector<Job> jobs, vector<int> order, int k) {
 }
 
 // calcula S1
-int calcula_S1(vector<int> f, int n, int r, vector< vector<int> > d) {
+int calcula_S1(vector<int> m, vector<int> f, int n, int r, vector<int> tempo_maquina1, vector<int> tempo_maquina2) {
     int s1 = 0;
 
-    // cout << "D ANTES DE ORDERNAR" << endl;
-    // for (int i = 0; i < d.size(); i++) {
-    //     for (int j = 0; j < d[i].size(); j++) {
-    //         cout << d[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
-    
-    // ordenar d[0][r+1...n] crescentemente
-    int m = n - r;
-    vector<int> d0(m);
-    for (int k = 0; k < m; k++) {
-        d0[k] = d[0][k + r];
+    cout << "M" << endl;
+    for (int i = 0; i < m.size(); i++) {
+        cout << m[i] << " ";
     }
+    cout << endl;
+
+    cout << "TEMPO MAQUINA 1" << endl;
+    for (int i = 0; i < tempo_maquina1.size(); i++) {
+        cout << tempo_maquina1[i] << " ";
+    }
+    cout << endl;
+
+    cout << "TEMPO MAQUINA 2" << endl;
+    for (int i = 0; i < tempo_maquina2.size(); i++) {
+        cout << tempo_maquina2[i] << " ";
+    }
+    cout << endl;
+
+    vector<int> d0(n - m.size());
+    vector<int> d1(n - m.size());
+    for (int i = 0; i < m.size(); i++) {
+        tempo_maquina1[m[i]] = -1;
+    }
+    int k = 0;
+    for (int i = 0; i < tempo_maquina1.size(); i++) {
+        if (tempo_maquina1[i] != -1) {
+            d0[k] = tempo_maquina1[i];
+            d1[k] = tempo_maquina2[i];
+            k++;
+        }
+    }
+
+    cout << "d0 ANTES DE ORDENAR" << endl;
+    for (int i = 0; i < d0.size(); i++) {
+        cout << d0[i] << " ";
+    }
+    cout << endl;
 
     sort(d0.begin(), d0.end());
 
@@ -103,10 +125,16 @@ int calcula_S1(vector<int> f, int n, int r, vector< vector<int> > d) {
         cout << d0[i] << " ";
     }
     cout << endl;
+
+    cout << "d1" << endl;
+    for (int i = 0; i < d1.size(); i++) {
+        cout << d1[i] << " ";
+    }
+    cout << endl;
     
     for (int k = r; k < n; k++) {
-        cout << "f[r-1]: " <<  f[r - 1] << " (n-k+1): " << (n - k) << " d0[k-r]: "<<  d0[k-r] << " d[1][k]: "<<  d[1][k] << endl;
-        s1 += f[r - 1] + (n - k) * d0[k-r] + d[1][k];
+        cout << "f[r-1]: " <<  f[r - 1] << " (n-k+1): " << (n - k) << " d0[k-r]: "<<  d0[k-r] << " d1[k-r]: "<<  d1[k-r] << endl;
+        s1 += f[r - 1] + (n - k) * d0[k-r] + d1[k-r];
     }
     
     return s1;
@@ -137,8 +165,10 @@ int calcula_S1(vector<int> f, int n, int r, vector< vector<int> > d) {
 void calcula_estimativa(vector<Job> jobs, int n, int r, vector< vector<int> > d) {
     cout << "n: " << n << " r: " << r << endl;
 
-    vector<int> v(1, 0);
-    vector<int> tempo_1 = final_times_m1(jobs, v);
+    vector<int> m;
+    m.push_back(0);
+    m.push_back(1);
+    vector<int> tempo_1 = final_times_m1(jobs, m);
 
     cout << "TEMPO_1: " << endl;
     for (int j = 0; j < n; j++) {
@@ -146,7 +176,7 @@ void calcula_estimativa(vector<Job> jobs, int n, int r, vector< vector<int> > d)
     }
     cout << endl;
 
-    int resultado_S1 = calcula_S1(tempo_1, n, r, d);
+    int resultado_S1 = calcula_S1(m, tempo_1, n, m.size(), d[0], d[1]);
 //    int resultado_S2 = calcula_S2(jobs, n, r, d);
     cout << resultado_S1 << "  " << endl;
 }
