@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include <climits>
 
 using namespace std;
 

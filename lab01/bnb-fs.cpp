@@ -1,10 +1,10 @@
 #include "bnb-fs.hpp"
 
 // guarda a melhor solucao ate o momento
-BestSolution best_solution = {vector<int>(), 90000};
+BestSolution best_solution = {vector<int>(), INT_MAX};
 
 // guarda o melhor limitante dual ate o momento
-int best_lower_bound = 90000;
+int best_lower_bound = INT_MAX;
 
 // encontra melhores posicoes para continuar a recursao
 vector<int> bound(vector<Job> jobs, vector<int> ordem, vector<int> restante) {
@@ -15,22 +15,29 @@ vector<int> bound(vector<Job> jobs, vector<int> ordem, vector<int> restante) {
         int elemento = restante[i];
 
         // *************************************************
-        vector<int> linha1(3);
-        vector<int> linha2(3);
 
-        linha1[0] = 2;
-        linha1[1] = 3;
-        linha1[2] = 2;
+        int n = jobs.size();
 
+        vector<int> machine1(n);
+        vector<int> machine2(n);
 
-        linha2[0] = 1;
-        linha2[1] = 1;
-        linha2[2] = 3;
+        for (int j = 0; j < n; j++) {
+            machine1[j] = jobs[j].time1;
+            machine2[j] = jobs[j].time2;
+        }
 
         vector< vector<int> > matriz;
 
-        matriz.push_back(linha1);
-        matriz.push_back(linha2);
+        matriz.push_back(machine1);
+        matriz.push_back(machine2);
+
+        for (int i = 0; i < matriz.size(); i++) {
+            for (int j = 0; j < matriz[i].size(); j++) {
+                cout << matriz[i][j] << " ";
+            }
+            cout << endl;
+        }
+
         // *************************************************
 
         vector<int> new_order = ordem;
@@ -51,11 +58,14 @@ vector<int> bound(vector<Job> jobs, vector<int> ordem, vector<int> restante) {
             melhores_posicoes.push_back(elemento);
         } else {
             if (estimativa_do_elemento < melhor_estimativa) {
-                 melhor_estimativa = estimativa_do_elemento;
+                melhor_estimativa = estimativa_do_elemento;
                 melhores_posicoes.clear();
                 melhores_posicoes.push_back(elemento);
+            }
 
-                cout << "Atualizei melhor estimativa" << endl;
+            if (estimativa_do_elemento < best_lower_bound) {
+                best_lower_bound = estimativa_do_elemento;
+                cout << "-> Atualizei best_lower_bound: " << best_lower_bound << endl;
             }
         }
     }
@@ -75,9 +85,8 @@ void branch_and_bound(vector<Job> jobs, vector<int> ordem, vector<int> restante)
     for (int i = 0; i < ordem.size(); i++) {
         cout << ordem[i] << " ";
     }
-    cout << endl;
 
-    cout << "restante: ";
+    cout << "/ restante: ";
     for (int i = 0; i < restante.size(); i++) {
         cout << restante[i] << " ";
     }
@@ -124,9 +133,6 @@ int main(int argc, char *argv[]) {
 
     vector<Job> jobs = read_jobs_file(input_file_name);
     vector<int> params = read_params_file(param_file_name);
-
-//     cout << "Jobs: " << endl;
-//     print_jobs(jobs);
 
     vector<int> ordem;
     vector<int> restante;
