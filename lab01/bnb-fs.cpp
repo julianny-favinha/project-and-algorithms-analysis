@@ -1,194 +1,10 @@
-#include "input.cpp"
-
-struct BestSolution {
-	list<int> order;
-	int sum;
-};
+#include "bnb-fs.hpp"
 
 // guarda a melhor solucao ate o momento
-BestSolution best_solution = {list<int>(), INT_MAX};
+BestSolution best_solution = {list<int>(), 90000};
 
 // guarda o melhor limitante dual ate o momento
-int best_lower_bound = INT_MAX;
-
-// imprime soma total na maquina 2
-void total_time(vector<Job> jobs, vector<int> order) {
-    int last_time_machine1 = 0;
-    int last_time_machine2 = 0;
-    int sum = 0;
-    
-    for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
-        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
-        sum += last_time_machine2;
-        cout << "m1: " << last_time_machine1 << ", m2: " << last_time_machine2 << ", sum: " << sum << endl;
-    }
-    
-    cout << "Time elapsed @ machine 2: " << sum << endl;
-}
-
-// retorna soma total na maquina 2
-int total_time_sum(vector<Job> jobs, vector<int> order) {
-    int last_time_machine1 = 0;
-    int last_time_machine2 = 0;
-    int sum = 0;
-    
-    for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
-        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
-        sum += last_time_machine2;
-    }
-    
-    return sum;
-}
-
-// retorna vector de tempos finais na maquina 1
-vector<int> final_times_m1(vector<Job> jobs, vector<int> order) {
-    vector<int> final_times(order.size());
-    
-    int last_time_machine1 = 0;
-    
-    for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
-        final_times[i] = last_time_machine1;
-    }
-    
-    return final_times;
-}
-
-// retorna vector de tempos finais na maquina 2
-vector<int> final_times_m2(vector<Job> jobs, vector<int> order) {
-    vector<int> final_times(order.size());
-    
-    int last_time_machine1 = 0;
-    int last_time_machine2 = 0;
-    
-    for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
-        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
-        final_times[i] = last_time_machine2;
-    }
-    
-    return final_times;
-}
-
-// calcula S1
-int calcula_S1(vector<int> m, vector<int> f, int n, int r, vector<int> tempo_maquina1, vector<int> tempo_maquina2) {
-    int s1 = 0;
-
-    // cout << "M" << endl;
-    // for (int i = 0; i < m.size(); i++) {
-    //     cout << m[i] << " ";
-    // }
-    // cout << endl;
-
-    // cout << "TEMPO MAQUINA 1" << endl;
-    // for (int i = 0; i < tempo_maquina1.size(); i++) {
-    //     cout << tempo_maquina1[i] << " ";
-    // }
-    // cout << endl;
-
-    // cout << "TEMPO MAQUINA 2" << endl;
-    // for (int i = 0; i < tempo_maquina2.size(); i++) {
-    //     cout << tempo_maquina2[i] << " ";
-    // }
-    // cout << endl;
-
-    vector<int> d0(n - m.size());
-    vector<int> d1(n - m.size());
-    for (int i = 0; i < m.size(); i++) {
-        tempo_maquina1[m[i]] = -1;
-    }
-    int k = 0;
-    for (int i = 0; i < tempo_maquina1.size(); i++) {
-        if (tempo_maquina1[i] != -1) {
-            d0[k] = tempo_maquina1[i];
-            d1[k] = tempo_maquina2[i];
-            k++;
-        }
-    }
-
-    // cout << "d0 ANTES DE ORDENAR" << endl;
-    // for (int i = 0; i < d0.size(); i++) {
-    //     cout << d0[i] << " ";
-    // }
-    // cout << endl;
-
-    sort(d0.begin(), d0.end());
-
-    // cout << "d0 DEPOIS DE ORDENAR" << endl;
-    // for (int i = 0; i < d0.size(); i++) {
-    //     cout << d0[i] << " ";
-    // }
-    // cout << endl;
-
-    // cout << "d1" << endl;
-    // for (int i = 0; i < d1.size(); i++) {
-    //     cout << d1[i] << " ";
-    // }
-    // cout << endl;
-    
-    for (int k = r; k < n; k++) {
-        cout << "f[r-1]: " <<  f[r - 1] << " (n-k+1): " << (n - k) << " d0[k-r]: "<<  d0[k-r] << " d1[k-r]: "<<  d1[k-r] << endl;
-        s1 += f[r - 1] + (n - k) * d0[k-r] + d1[k-r];
-    }
-    
-    return s1;
-}
-
-// calcula S2
-int calcula_S2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> tempo_maquina1, vector<int> tempo_maquina2) {
-    int s2 = 0;
-
-    vector<int> d0(n - m.size());
-    vector<int> d1(n - m.size());
-    for (int i = 0; i < m.size(); i++) {
-        tempo_maquina1[m[i]] = -1;
-    }
-    int k = 0;
-    for (int i = 0; i < tempo_maquina1.size(); i++) {
-        if (tempo_maquina1[i] != -1) {
-            d0[k] = tempo_maquina1[i];
-            d1[k] = tempo_maquina2[i];
-            k++;
-        }
-    }
-
-    sort(d0.begin(), d0.end());
-    sort(d1.begin(), d1.end());
-
-    for (int k = r; k < n; k++) {
-        s2 += (n - k) * d1[k - r];
-    }
-
-    int minimum = d0[0] + f1[r - 1];
-    int maximum = max(f2[r - 1], minimum);
-
-    return s2 + (n - r) * maximum;
-}
-
-// calcula estimativa
-void calcula_estimativa(vector<Job> jobs, int n, int r, vector< vector<int> > d) {
-    cout << "n: " << n << " r: " << r << endl;
-
-    vector<int> m(1, 1);
-    vector<int> tempo_1 = final_times_m1(jobs, m);
-    vector<int> tempo_2 = final_times_m2(jobs, m);
-
-    cout << "TEMPO_1: " << endl;
-    for (int j = 0; j < n; j++) {
-     cout << tempo_1[j] << " ";
-    }
-    cout << endl;
-
-    // int s1 = calcula_S1(m, tempo_1, n, m.size(), d[0], d[1]);
-    int s2 = calcula_S2(m, tempo_1, tempo_2, n, m.size(), d[0], d[1]);
-    cout << s2 << endl;
-}
+int best_lower_bound = 90000;
 
 // encontra melhores posicoes para continuar a recursao
 //vector<int> encontra_melhores_posicoes(list<int> ordem, list<int> restante) {
@@ -245,9 +61,9 @@ int main(int argc, char *argv[]) {
     vector<Job> jobs = read_jobs_file(input_file_name);
     vector<int> params = read_params_file(param_file_name);
 
-    // cout << "Jobs: " << endl;
-    // print_jobs(jobs);
-
+//     cout << "Jobs: " << endl;
+//     print_jobs(jobs);
+//
 //    list<int> ordem;
 //    list<int> restante;
 //
@@ -271,12 +87,12 @@ int main(int argc, char *argv[]) {
     vector<int> linha2(3);
 
     linha1[0] = 2;
-    linha1[1] = 3;  
+    linha1[1] = 3;
     linha1[2] = 2;
 
 
     linha2[0] = 1;
-    linha2[1] = 1;  
+    linha2[1] = 1;
     linha2[2] = 3;
 
     vector< vector<int> > matriz;
@@ -284,7 +100,7 @@ int main(int argc, char *argv[]) {
     matriz.push_back(linha1);
     matriz.push_back(linha2);
 
-    calcula_estimativa(jobs, jobs.size(), 1, matriz);
+    calcula_estimativa(jobs, (int)jobs.size(), 1, matriz);
 
     return 0;
 };
