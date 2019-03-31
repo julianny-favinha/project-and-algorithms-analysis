@@ -20,16 +20,7 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<i
         vector<int> new_order = ordem;
         new_order.push_back(elemento);
 
-        int estimativa_do_elemento;
-
-        if (new_order.size() < n) {
-            estimativa_do_elemento = estimate_lower_bound(jobs, n, new_order);
-
-            cout << "estimativa_do_elemento: " << estimativa_do_elemento << endl;
-        } else {
-            cout << "CHEGOU NUMA FOLHA" << endl;
-            estimativa_do_elemento = total_time_sum(jobs, new_order);
-        }
+        int estimativa_do_elemento = estimate_lower_bound(jobs, n, new_order);
 
         if (estimativa_do_elemento == melhor_estimativa) {
             melhores_posicoes.push_back(elemento);
@@ -42,15 +33,15 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<i
 
             if (estimativa_do_elemento < best_lower_bound) {
                 best_lower_bound = estimativa_do_elemento;
-                cout << "-> Atualizei best_lower_bound: " << best_lower_bound << endl;
+                cout << "****** Novo best_lower_bound: " << best_lower_bound << endl;
             }
-        }
+        }    
     }
 
     cout << "melhores_posicoes: ";
-        for (int i = 0; i < melhores_posicoes.size(); i++) {
-            cout << melhores_posicoes[i] << " ";
-        }
+    for (int i = 0; i < melhores_posicoes.size(); i++) {
+        cout << melhores_posicoes[i] << " ";
+    }
     cout << endl;
 
     return melhores_posicoes;
@@ -69,7 +60,7 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> ordem, vect
     }
     cout << endl;
 
-    if (!restante.empty()) {
+    if (ordem.size() < n-1) {
         vector<int> melhores_posicoes = bound(jobs, n, ordem, restante);
 
         for (int i = 0; i < melhores_posicoes.size(); i++) {
@@ -85,27 +76,28 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> ordem, vect
 
             ordem.push_back(elemento);
             restante.erase(restante.begin() + index);
+            
             branch_and_bound(jobs, n, ordem, restante);
+
+            ordem.erase(ordem.end()-1);
+            restante.push_back(elemento);
         }
     } else {
-       int soma = total_time_sum(jobs, ordem);
+        ordem.push_back(restante[0]);
+        restante.clear();
 
-        if (soma == best_lower_bound || soma < best_solution.sum) {
+        int soma = total_time_sum(jobs, ordem);
+        cout << "Soma folha: " << soma << endl;
+
+        if (soma == best_lower_bound) {
             best_solution.sum = soma;
             best_solution.order = ordem;
+        }
 
-            cout << "****ENCONTREI UMA MELHOR SOLUCAO****" << endl << "ORDEM: ";
-            for (int i = 0; i < best_solution.order.size(); i++) {
-                cout << best_solution.order[i] << " ";
-            }
-            cout << endl << "SOMA: " << best_solution.sum << endl;
-
-            clock_t tempo_termino = clock();
-
-            printf("[CLOCK] Tempo total: %.5f segundos\n", ((tempo_termino - tempo_inicio) / (float)CLOCKS_PER_SEC));
-
-            exit(0);
-       }
+        if (soma < best_solution.sum) {
+            best_solution.sum = soma;
+            best_solution.order = ordem;
+        }
     }
 }
 
@@ -126,6 +118,17 @@ int main(int argc, char *argv[]) {
     tempo_inicio = clock();
 
     branch_and_bound(input.jobs, input.count, ordem, restante);
+
+    cout << "****ENCONTREI UMA MELHOR SOLUCAO****" << endl << "ORDEM: ";
+    for (int i = 0; i < best_solution.order.size(); i++) {
+        cout << best_solution.order[i] << " ";
+    }
+    cout << endl << "SOMA: " << best_solution.sum << endl;
+
+    clock_t tempo_termino = clock();
+
+    printf("[CLOCK] Tempo total: %.5f segundos\n", ((tempo_termino - tempo_inicio) / (float)CLOCKS_PER_SEC));
+
 
     return 0;
 }
