@@ -10,14 +10,15 @@ int best_lower_bound = INT_MAX;
 clock_t tempo_inicio;
 
 // encontra melhores posicoes para continuar a recursao
-vector<int> bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<int> restante) {
+vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
     int melhor_estimativa = INT_MAX;
     vector<int> melhores_posicoes;
+    melhores_posicoes.reserve(n);
 
-    for (int i = 0; i < restante.size(); i++) {
-        int elemento = restante[i];
+    for (int i = 0; i < remaining.size(); i++) {
+        int elemento = remaining[i];
 
-        vector<int> new_order = ordem;
+        vector<int> new_order = order;
         new_order.push_back(elemento);
 
         int estimativa_do_elemento = estimate_lower_bound(jobs, n, new_order);
@@ -33,91 +34,93 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<i
 
             if (estimativa_do_elemento < best_lower_bound) {
                 best_lower_bound = estimativa_do_elemento;
-                cout << "****** Novo best_lower_bound: " << best_lower_bound << endl;
+                // cout << "****** Novo best_lower_bound: " << best_lower_bound << endl;
             }
         }    
     }
 
-    cout << "melhores_posicoes: ";
-    for (int i = 0; i < melhores_posicoes.size(); i++) {
-        cout << melhores_posicoes[i] << " ";
-    }
-    cout << endl;
+    // cout << "melhores_posicoes: ";
+    // for (int i = 0; i < melhores_posicoes.size(); i++) {
+    //     cout << melhores_posicoes[i] << " ";
+    // }
+    // cout << endl;
 
     return melhores_posicoes;
 }
 
 // // recursao
-void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<int> restante) {
-    cout << "ordem: ";
-    for (int i = 0; i < ordem.size(); i++) {
-        cout << ordem[i] << " ";
-    }
+void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
+    // cout << "order: ";
+    // for (int i = 0; i < order.size(); i++) {
+    //     cout << order[i] << " ";
+    // }
 
-    cout << "/ restante: ";
-    for (int i = 0; i < restante.size(); i++) {
-        cout << restante[i] << " ";
-    }
-    cout << endl;
+    // cout << "/ remaining: ";
+    // for (int i = 0; i < remaining.size(); i++) {
+    //     cout << remaining[i] << " ";
+    // }
+    // cout << endl;
 
-    if (ordem.size() < n-1) {
-        vector<int> melhores_posicoes = bound(jobs, n, ordem, restante);
+    if (order.size() < n-1) {
+        vector<int> melhores_posicoes = bound(jobs, n, order, remaining);
 
         for (int i = 0; i < melhores_posicoes.size(); i++) {
             int elemento = melhores_posicoes[i];
 
             // encontra posicao para remover elemento
             int index = 0;
-            for (index = 0; index < restante.size(); index++) {
-                if (restante[index] == elemento) {
+            for (index = 0; index < remaining.size(); index++) {
+                if (remaining[index] == elemento) {
                     break;
                 }
             }
 
-            ordem.push_back(elemento);
-            restante.erase(restante.begin() + index);
+            order.push_back(elemento);
+            remaining.erase(remaining.begin() + index);
             
-            branch_and_bound(jobs, n, ordem, restante);
+            branch_and_bound(jobs, n, order, remaining);
 
-            ordem.erase(ordem.end()-1);
-            restante.push_back(elemento);
+            order.pop_back();
+            remaining.push_back(elemento);
         }
     } else {
-        ordem.push_back(restante[0]);
-        restante.clear();
+        order.push_back(remaining[0]);
+        remaining.clear();
 
-        int soma = total_time_sum(jobs, ordem);
-        cout << "Soma folha: " << soma << endl;
+        int soma = total_time_sum(jobs, order);
+        // cout << "Soma folha: " << soma << endl;
 
         if (soma == best_lower_bound) {
             best_solution.sum = soma;
-            best_solution.order = ordem;
+            best_solution.order = order;
         }
 
         if (soma < best_solution.sum) {
             best_solution.sum = soma;
-            best_solution.order = ordem;
+            best_solution.order = order;
         }
     }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {\
+    tempo_inicio = clock();
+
     char *input_file_name = argv[1];
     char *param_file_name = argv[2];
 
     Input input = read_jobs_file(input_file_name);
     vector<int> params = read_params_file(param_file_name);
 
-    vector<int> ordem;
-    vector<int> restante;
+    vector<int> order;
+    order.reserve(input.count);
+    vector<int> remaining;
+    remaining.reserve(input.count);
 
     for (int i = 0; i < input.count; i++) {
-        restante.push_back(i);
+        remaining.push_back(i);
     }
 
-    tempo_inicio = clock();
-
-    branch_and_bound(input.jobs, input.count, ordem, restante);
+    branch_and_bound(input.jobs, input.count, order, remaining);
 
     cout << "****ENCONTREI UMA MELHOR SOLUCAO****" << endl << "ORDEM: ";
     for (int i = 0; i < best_solution.order.size(); i++) {

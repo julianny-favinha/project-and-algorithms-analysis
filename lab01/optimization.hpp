@@ -17,12 +17,12 @@ vector<int> final_times_m1(vector< vector<int> > jobs, vector<int> order);
 vector<int> final_times_m2(vector< vector<int> > jobs, vector<int> order);
 
 // calcula o valor para um candidato para limitante dual relaxando o problema em relacao a maquina 1
-int s1(vector< vector<int> > jobs, int n, vector<int> m, vector<int> final_times_machine1);
+int s1(vector< vector<int> > jobs, int n, vector<int> order, vector<int> final_times_machine1);
 
 // Calcula o valor para um candidato para limitante dual relaxando o problema em relacao a maquina 2
-int s2(vector< vector<int> > jobs, int n, vector<int> m, vector<int> final_times_machine1, vector<int> final_times_machine2);
+int s2(vector< vector<int> > jobs, int n, vector<int> order, vector<int> final_times_machine1, vector<int> final_times_machine2);
 
 // calcula estimativa baseada nas relaxacoes
-int estimate_lower_bound(vector< vector<int> > jobs, int n, vector<int> m);
+int estimate_lower_bound(vector< vector<int> > jobs, int n, vector<int> order);
 
 #endif /* optimization_hpp */
