@@ -33,26 +33,28 @@ int main(int argc, char *argv[]) {
 
   // define a semente do gerador pseudo-aleatorio
   srand(unsigned(time(0)));
-  // vetor de N elementos
+
   vector<int> V(N);
-  // gera N inteiros aleatorios e armazena em V
   generate(V.begin(), V.end(), rand);
+
   // estruturas auxiliares para utilizar a biblioteca time.h
   clock_t tempo_inicio = 0, tempo_termino;
+  
   // tempo de inÃ­cio usando a biblioteca chrono
   auto tempo_inicio_c = chrono::high_resolution_clock::now();
   // tempo de inÃ­cio usando a biblioteca time.h
   tempo_inicio = clock();
+
   sort(V.begin(), V.end());
+
   // tempo de termino usando a biblioteca time.h
   tempo_termino = clock();
   // tempo de termino usando a biblioteca chrono
   auto tempo_termino_c = chrono::high_resolution_clock::now();
+
   // calcula a diferença dos tempos de termino e inicio; imprime o resultado
-  printf("[CLOCK] Tempo total: %.2f segundos\n",
-         ((tempo_termino - tempo_inicio) / (float)CLOCKS_PER_SEC));
-  printf("[CHRONO] Tempo total: %.2f segundos\n",
-         chrono::duration<double>(tempo_termino_c - tempo_inicio_c).count());
+  printf("[CLOCK] Tempo total: %.2f segundos\n", ((tempo_termino - tempo_inicio) / (float)CLOCKS_PER_SEC));
+  printf("[CHRONO] Tempo total: %.2f segundos\n", chrono::duration<double>(tempo_termino_c - tempo_inicio_c).count());
 
   return 0;
 }

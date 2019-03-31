@@ -8,11 +8,19 @@
 #include <algorithm>
 #include <list>
 #include <climits>
+#include <chrono>
+#include <time.h>
+#include <cstdlib>
 
 using namespace std;
 
+struct Input {
+	vector< vector<int> > jobs;
+	int count;
+};
+
 // le o aqruivo com as tarefas
-vector< vector<int> > read_jobs_file(char *name);
+Input read_jobs_file(char *name);
 
 // imprime o vetor com as tarefas
 void print_jobs(vector< vector<int> > jobs);
