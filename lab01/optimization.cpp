@@ -10,10 +10,10 @@ void print_total_time(vector< vector<int> > jobs, vector<int> order) {
         last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
         last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[1][order[i]];
         sum += last_time_machine2;
-        cout << "m1: " << last_time_machine1 << ", m2: " << last_time_machine2 << ", sum: " << sum << endl;
+        // cout << "m1: " << last_time_machine1 << ", m2: " << last_time_machine2 << ", sum: " << sum << endl;
     }
 
-    cout << "Time elapsed @ machine 2: " << sum << endl;
+    // cout << "Time elapsed @ machine 2: " << sum << endl;
 }
 
 // retorna soma total na maquina 2
