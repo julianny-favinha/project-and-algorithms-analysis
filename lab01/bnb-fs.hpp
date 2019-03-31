@@ -9,8 +9,8 @@ struct BestSolution {
     int sum;
 };
 
-vector<int> bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> restante);
+vector<int> bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<int> restante);
 
-void branch_and_bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> restante);
+void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<int> restante);
 
 #endif /* bnb_fs_hpp */

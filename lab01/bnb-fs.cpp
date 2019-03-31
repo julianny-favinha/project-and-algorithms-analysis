@@ -1,13 +1,16 @@
 #include "bnb-fs.hpp"
 
-// guarda a melhor solucao ate o momento
+// melhor solucao ate o momento
 BestSolution best_solution = {vector<int>(), INT_MAX};
 
-// guarda o melhor limitante dual ate o momento
+// melhor limitante dual ate o momento
 int best_lower_bound = INT_MAX;
 
+// tempo de execucao do branch and bound
+clock_t tempo_inicio;
+
 // encontra melhores posicoes para continuar a recursao
-vector<int> bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> restante) {
+vector<int> bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<int> restante) {
     int melhor_estimativa = INT_MAX;
     vector<int> melhores_posicoes;
 
@@ -19,8 +22,8 @@ vector<int> bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> res
 
         int estimativa_do_elemento;
 
-        if (new_order.size() < jobs[0].size()) {
-            estimativa_do_elemento = estimate_lower_bound(jobs, new_order, new_order.size());
+        if (new_order.size() < n) {
+            estimativa_do_elemento = estimate_lower_bound(jobs, n, new_order);
 
             cout << "estimativa_do_elemento: " << estimativa_do_elemento << endl;
         } else {
@@ -54,7 +57,7 @@ vector<int> bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> res
 }
 
 // // recursao
-void branch_and_bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> restante) {
+void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> ordem, vector<int> restante) {
     cout << "ordem: ";
     for (int i = 0; i < ordem.size(); i++) {
         cout << ordem[i] << " ";
@@ -67,7 +70,7 @@ void branch_and_bound(vector< vector<int> > jobs, vector<int> ordem, vector<int>
     cout << endl;
 
     if (!restante.empty()) {
-        vector<int> melhores_posicoes = bound(jobs, ordem, restante);
+        vector<int> melhores_posicoes = bound(jobs, n, ordem, restante);
 
         for (int i = 0; i < melhores_posicoes.size(); i++) {
             int elemento = melhores_posicoes[i];
@@ -82,7 +85,7 @@ void branch_and_bound(vector< vector<int> > jobs, vector<int> ordem, vector<int>
 
             ordem.push_back(elemento);
             restante.erase(restante.begin() + index);
-            branch_and_bound(jobs, ordem, restante);
+            branch_and_bound(jobs, n, ordem, restante);
         }
     } else {
        int soma = total_time_sum(jobs, ordem);
@@ -96,6 +99,11 @@ void branch_and_bound(vector< vector<int> > jobs, vector<int> ordem, vector<int>
                 cout << best_solution.order[i] << " ";
             }
             cout << endl << "SOMA: " << best_solution.sum << endl;
+
+            clock_t tempo_termino = clock();
+
+            printf("[CLOCK] Tempo total: %.5f segundos\n", ((tempo_termino - tempo_inicio) / (float)CLOCKS_PER_SEC));
+
             exit(0);
        }
     }
@@ -105,17 +113,19 @@ int main(int argc, char *argv[]) {
     char *input_file_name = argv[1];
     char *param_file_name = argv[2];
 
-    vector< vector<int> > jobs = read_jobs_file(input_file_name);
+    Input input = read_jobs_file(input_file_name);
     vector<int> params = read_params_file(param_file_name);
 
     vector<int> ordem;
     vector<int> restante;
 
-    for (int i = 0; i < jobs[0].size(); i++) {
+    for (int i = 0; i < input.count; i++) {
         restante.push_back(i);
     }
 
-    branch_and_bound(jobs, ordem, restante);
+    tempo_inicio = clock();
+
+    branch_and_bound(input.jobs, input.count, ordem, restante);
 
     return 0;
 }

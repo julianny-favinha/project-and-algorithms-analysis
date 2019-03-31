@@ -1,6 +1,6 @@
 #include "input.hpp"
 
-vector< vector<int> > read_jobs_file(char *name) {
+Input read_jobs_file(char *name) {
     ifstream file;
     file.open(name);
 
@@ -24,7 +24,8 @@ vector< vector<int> > read_jobs_file(char *name) {
     jobs.push_back(machine1);
     jobs.push_back(machine2);
 
-    return jobs;
+    Input input = {jobs, n};
+    return input;
 }
 
 void print_jobs(vector< vector<int> > jobs) {

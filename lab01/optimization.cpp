@@ -78,8 +78,9 @@ static void initialize(vector<int> &d0, vector<int> &d1, vector<int> &m, int n, 
 }
 
 // calcula S1
-int s1(vector<int> m, vector<int> f, int n, int r, vector<int> time_machine1, vector<int> time_machine2) {
+int s1(vector< vector<int> > jobs, int n, vector<int> m, vector<int> final_times_machine1) {
     int value = 0;
+    int r = m.size();
 
     // cout << "M" << endl;
     // for (int i = 0; i < m.size(); i++) {
@@ -101,7 +102,7 @@ int s1(vector<int> m, vector<int> f, int n, int r, vector<int> time_machine1, ve
 
     vector<int> d0;
     vector<int> d1;
-    initialize(d0, d1, m, n, time_machine1, time_machine2);
+    initialize(d0, d1, m, n, jobs[0], jobs[1]);
 
     // cout << "d0 ANTES DE ORDENAR" << endl;
     // for (int i = 0; i < d0.size(); i++) {
@@ -124,20 +125,21 @@ int s1(vector<int> m, vector<int> f, int n, int r, vector<int> time_machine1, ve
     // cout << endl;
 
     for (int k = r; k < n; k++) {
-        // cout << "f[r-1]: " <<  f[r - 1] << " (n-k+1): " << (n - k) << " d0[k-r]: "<<  d0[k-r] << " d1[k-r]: "<<  d1[k-r] << endl;
-        value += f[r - 1] + (n - k) * d0[k-r] + d1[k-r];
+        // cout << "final_times_machine1[r-1]: " <<  final_times_machine1[r - 1] << " (n-k+1): " << (n - k) << " d0[k-r]: "<<  d0[k-r] << " d1[k-r]: "<<  d1[k-r] << endl;
+        value += final_times_machine1[r - 1] + (n - k) * d0[k-r] + d1[k-r];
     }
 
     return value;
 }
 
 // calcula S2
-int s2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> time_machine1, vector<int> time_machine2) {
+int s2(vector< vector<int> > jobs, int n, vector<int> m, vector<int> final_times_machine1, vector<int> final_times_machine2) {
     int value = 0;
+    int r = m.size();
 
     vector<int> d0;
     vector<int> d1;
-    initialize(d0, d1, m, n, time_machine1, time_machine2);
+    initialize(d0, d1, m, n, jobs[0], jobs[1]);
 
     sort(d0.begin(), d0.end());
     sort(d1.begin(), d1.end());
@@ -146,14 +148,16 @@ int s2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> 
         value += (n - k) * d1[k - r];
     }
 
-    int minimum = d0[0] + f1[r - 1];
-    int maximum = max(f2[r - 1], minimum);
+    int minimum = d0[0] + final_times_machine1[r - 1];
+    int maximum = max(final_times_machine2[r - 1], minimum);
 
     return value + (n - r) * maximum;
 }
 
 // calcula estimativa
-int estimate_lower_bound(vector< vector<int> > jobs, vector<int> m, int r) {
+int estimate_lower_bound(vector< vector<int> > jobs, int n, vector<int> m) {
+    int r = m.size();
+
     cout << "m: ";
     for (int i = 0; i < m.size(); i++) {
         cout << m[i] << " ";
@@ -177,8 +181,8 @@ int estimate_lower_bound(vector< vector<int> > jobs, vector<int> m, int r) {
     int sum_times_machine2 = total_time_sum(jobs, m);
     cout << "/ sum_times_machine2: " << sum_times_machine2 << endl;
 
-    int value_s1 = s1(m, time_machine1, jobs[0].size(), m.size(), jobs[0], jobs[1]);
-    int value_s2 = s2(m, time_machine1, time_machine2, jobs[0].size(), m.size(), jobs[0], jobs[1]);
+    int value_s1 = s1(jobs, n, m, time_machine1);
+    int value_s2 = s2(jobs, n, m, time_machine1, time_machine2);
     cout << "s1: " << value_s1 << ", s2: " << value_s2 << endl;
     return sum_times_machine2 + max(value_s1, value_s2);
 }
