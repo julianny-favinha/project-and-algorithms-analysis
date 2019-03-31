@@ -11,16 +11,11 @@
 
 using namespace std;
 
-struct Job {
-    int time1;
-    int time2;
-};
+// le o aqruivo com as tarefas
+vector< vector<int> > read_jobs_file(char *name);
 
-// Le o aqruivo com as tarefas
-vector<Job> read_jobs_file(char *name);
-
-// Vizualiza o vetor com as tarefas
-int print_jobs(vector<Job> jobs);
+// imprime o vetor com as tarefas
+void print_jobs(vector< vector<int> > jobs);
 
 vector<int> read_params_file(char *name);
 

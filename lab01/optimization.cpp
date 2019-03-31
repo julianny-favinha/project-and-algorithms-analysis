@@ -1,15 +1,14 @@
 #include "optimization.hpp"
 
 // imprime soma total na maquina 2
-void print_total_time(vector<Job> jobs, vector<int> order) {
+void print_total_time(vector< vector<int> > jobs, vector<int> order) {
     int last_time_machine1 = 0;
     int last_time_machine2 = 0;
     int sum = 0;
 
     for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
-        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
+        last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
+        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[1][order[i]];
         sum += last_time_machine2;
         cout << "m1: " << last_time_machine1 << ", m2: " << last_time_machine2 << ", sum: " << sum << endl;
     }
@@ -18,15 +17,14 @@ void print_total_time(vector<Job> jobs, vector<int> order) {
 }
 
 // retorna soma total na maquina 2
-int total_time_sum(vector<Job> jobs, vector<int> order) {
+int total_time_sum(vector< vector<int> > jobs, vector<int> order) {
     int last_time_machine1 = 0;
     int last_time_machine2 = 0;
     int sum = 0;
 
     for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
-        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
+        last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
+        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[1][order[i]];
         sum += last_time_machine2;
     }
 
@@ -34,14 +32,13 @@ int total_time_sum(vector<Job> jobs, vector<int> order) {
 }
 
 // retorna vector de tempos finais na maquina 1
-vector<int> final_times_m1(vector<Job> jobs, vector<int> order) {
+vector<int> final_times_m1(vector< vector<int> > jobs, vector<int> order) {
     vector<int> final_times(order.size());
 
     int last_time_machine1 = 0;
 
     for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
+        last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
         final_times[i] = last_time_machine1;
     }
 
@@ -49,16 +46,15 @@ vector<int> final_times_m1(vector<Job> jobs, vector<int> order) {
 }
 
 // retorna vector de tempos finais na maquina 2
-vector<int> final_times_m2(vector<Job> jobs, vector<int> order) {
+vector<int> final_times_m2(vector< vector<int> > jobs, vector<int> order) {
     vector<int> final_times(order.size());
 
     int last_time_machine1 = 0;
     int last_time_machine2 = 0;
 
     for (int i = 0; i < order.size(); i++) {
-        int machine = order[i];
-        last_time_machine1 = last_time_machine1 + jobs[machine].time1;
-        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
+        last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
+        last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[1][order[i]];
         final_times[i] = last_time_machine2;
     }
 
@@ -157,7 +153,7 @@ int s2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> 
 }
 
 // calcula estimativa
-int estimate_lower_bound(vector<Job> jobs, vector<int> m, int r, vector< vector<int> > d) {
+int estimate_lower_bound(vector< vector<int> > jobs, vector<int> m, int r) {
     cout << "m: ";
     for (int i = 0; i < m.size(); i++) {
         cout << m[i] << " ";
@@ -181,9 +177,8 @@ int estimate_lower_bound(vector<Job> jobs, vector<int> m, int r, vector< vector<
     int sum_times_machine2 = total_time_sum(jobs, m);
     cout << "/ sum_times_machine2: " << sum_times_machine2 << endl;
 
-    int value_s1 = s1(m, time_machine1, jobs.size(), m.size(), d[0], d[1]);
-    int value_s2 = s2(m, time_machine1, time_machine2, jobs.size(), m.size(), d[0], d[1]);
+    int value_s1 = s1(m, time_machine1, jobs[0].size(), m.size(), jobs[0], jobs[1]);
+    int value_s2 = s2(m, time_machine1, time_machine2, jobs[0].size(), m.size(), jobs[0], jobs[1]);
     cout << "s1: " << value_s1 << ", s2: " << value_s2 << endl;
-
     return sum_times_machine2 + max(value_s1, value_s2);
 }

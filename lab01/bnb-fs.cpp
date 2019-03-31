@@ -7,46 +7,20 @@ BestSolution best_solution = {vector<int>(), INT_MAX};
 int best_lower_bound = INT_MAX;
 
 // encontra melhores posicoes para continuar a recursao
-vector<int> bound(vector<Job> jobs, vector<int> ordem, vector<int> restante) {
+vector<int> bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> restante) {
     int melhor_estimativa = INT_MAX;
     vector<int> melhores_posicoes;
 
     for (int i = 0; i < restante.size(); i++) {
         int elemento = restante[i];
 
-        // *************************************************
-
-        int n = jobs.size();
-
-        vector<int> machine1(n);
-        vector<int> machine2(n);
-
-        for (int j = 0; j < n; j++) {
-            machine1[j] = jobs[j].time1;
-            machine2[j] = jobs[j].time2;
-        }
-
-        vector< vector<int> > matriz;
-
-        matriz.push_back(machine1);
-        matriz.push_back(machine2);
-
-        for (int i = 0; i < matriz.size(); i++) {
-            for (int j = 0; j < matriz[i].size(); j++) {
-                cout << matriz[i][j] << " ";
-            }
-            cout << endl;
-        }
-
-        // *************************************************
-
         vector<int> new_order = ordem;
         new_order.push_back(elemento);
 
         int estimativa_do_elemento;
 
-        if (new_order.size() < jobs.size()) {
-            estimativa_do_elemento = estimate_lower_bound(jobs, new_order, new_order.size(), matriz);
+        if (new_order.size() < jobs[0].size()) {
+            estimativa_do_elemento = estimate_lower_bound(jobs, new_order, new_order.size());
 
             cout << "estimativa_do_elemento: " << estimativa_do_elemento << endl;
         } else {
@@ -80,7 +54,7 @@ vector<int> bound(vector<Job> jobs, vector<int> ordem, vector<int> restante) {
 }
 
 // // recursao
-void branch_and_bound(vector<Job> jobs, vector<int> ordem, vector<int> restante) {
+void branch_and_bound(vector< vector<int> > jobs, vector<int> ordem, vector<int> restante) {
     cout << "ordem: ";
     for (int i = 0; i < ordem.size(); i++) {
         cout << ordem[i] << " ";
@@ -131,13 +105,13 @@ int main(int argc, char *argv[]) {
     char *input_file_name = argv[1];
     char *param_file_name = argv[2];
 
-    vector<Job> jobs = read_jobs_file(input_file_name);
+    vector< vector<int> > jobs = read_jobs_file(input_file_name);
     vector<int> params = read_params_file(param_file_name);
 
     vector<int> ordem;
     vector<int> restante;
 
-    for (int i = 0; i < jobs.size(); i++) {
+    for (int i = 0; i < jobs[0].size(); i++) {
         restante.push_back(i);
     }
 
