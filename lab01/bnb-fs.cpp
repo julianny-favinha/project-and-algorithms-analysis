@@ -100,7 +100,8 @@ int main(int argc, char *argv[]) {
     matriz.push_back(linha1);
     matriz.push_back(linha2);
 
-    calcula_estimativa(jobs, (int)jobs.size(), 1, matriz);
+    int lower_bound = estimate_lower_bound(jobs, jobs.size(), 1, matriz);
+    cout << "Estimativa: " << lower_bound << endl;
 
     return 0;
-};
+}

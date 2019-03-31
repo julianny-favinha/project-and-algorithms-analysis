@@ -1,7 +1,7 @@
 #include "optimization.hpp"
 
 // imprime soma total na maquina 2
-void total_time(vector<Job> jobs, vector<int> order) {
+void print_total_time(vector<Job> jobs, vector<int> order) {
     int last_time_machine1 = 0;
     int last_time_machine2 = 0;
     int sum = 0;
@@ -65,25 +65,25 @@ vector<int> final_times_m2(vector<Job> jobs, vector<int> order) {
     return final_times;
 }
 
-static void inicializaVetores(vector<int> &d0, vector<int> &d1, vector<int> &m, int n, vector<int> &tempo_maquina1, vector<int> &tempo_maquina2) {
+static void initialize(vector<int> &d0, vector<int> &d1, vector<int> &m, int n, vector<int> &time_machine1, vector<int> &time_machine2) {
     d0 = vector<int>(n - m.size());
     d1 = vector<int>(n - m.size());
     for (int i = 0; i < m.size(); i++) {
-        tempo_maquina1[m[i]] = -1;
+        time_machine1[m[i]] = -1;
     }
     int k = 0;
-    for (int i = 0; i < tempo_maquina1.size(); i++) {
-        if (tempo_maquina1[i] != -1) {
-            d0[k] = tempo_maquina1[i];
-            d1[k] = tempo_maquina2[i];
+    for (int i = 0; i < time_machine1.size(); i++) {
+        if (time_machine1[i] != -1) {
+            d0[k] = time_machine1[i];
+            d1[k] = time_machine2[i];
             k++;
         }
     }
 }
 
 // calcula S1
-int calcula_S1(vector<int> m, vector<int> f, int n, int r, vector<int> tempo_maquina1, vector<int> tempo_maquina2) {
-    int s1 = 0;
+int s1(vector<int> m, vector<int> f, int n, int r, vector<int> time_machine1, vector<int> time_machine2) {
+    int value = 0;
 
     // cout << "M" << endl;
     // for (int i = 0; i < m.size(); i++) {
@@ -92,20 +92,20 @@ int calcula_S1(vector<int> m, vector<int> f, int n, int r, vector<int> tempo_maq
     // cout << endl;
 
     // cout << "TEMPO MAQUINA 1" << endl;
-    // for (int i = 0; i < tempo_maquina1.size(); i++) {
-    //     cout << tempo_maquina1[i] << " ";
+    // for (int i = 0; i < time_machine1.size(); i++) {
+    //     cout << time_machine1[i] << " ";
     // }
     // cout << endl;
 
     // cout << "TEMPO MAQUINA 2" << endl;
-    // for (int i = 0; i < tempo_maquina2.size(); i++) {
-    //     cout << tempo_maquina2[i] << " ";
+    // for (int i = 0; i < time_machine2.size(); i++) {
+    //     cout << time_machine2[i] << " ";
     // }
     // cout << endl;
 
     vector<int> d0;
     vector<int> d1;
-    inicializaVetores(d0, d1, m, n, tempo_maquina1, tempo_maquina2);
+    initialize(d0, d1, m, n, time_machine1, time_machine2);
 
     // cout << "d0 ANTES DE ORDENAR" << endl;
     // for (int i = 0; i < d0.size(); i++) {
@@ -129,48 +129,46 @@ int calcula_S1(vector<int> m, vector<int> f, int n, int r, vector<int> tempo_maq
 
     for (int k = r; k < n; k++) {
         cout << "f[r-1]: " <<  f[r - 1] << " (n-k+1): " << (n - k) << " d0[k-r]: "<<  d0[k-r] << " d1[k-r]: "<<  d1[k-r] << endl;
-        s1 += f[r - 1] + (n - k) * d0[k-r] + d1[k-r];
+        value += f[r - 1] + (n - k) * d0[k-r] + d1[k-r];
     }
 
-    return s1;
+    return value;
 }
 
 // calcula S2
-int calcula_S2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> tempo_maquina1, vector<int> tempo_maquina2) {
-    int s2 = 0;
+int s2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> time_machine1, vector<int> time_machine2) {
+    int value = 0;
 
     vector<int> d0;
     vector<int> d1;
-    inicializaVetores(d0, d1, m, n, tempo_maquina1, tempo_maquina2);
+    initialize(d0, d1, m, n, time_machine1, time_machine2);
 
     sort(d0.begin(), d0.end());
     sort(d1.begin(), d1.end());
 
     for (int k = r; k < n; k++) {
-        s2 += (n - k) * d1[k - r];
+        value += (n - k) * d1[k - r];
     }
 
     int minimum = d0[0] + f1[r - 1];
     int maximum = max(f2[r - 1], minimum);
 
-    return s2 + (n - r) * maximum;
+    return value + (n - r) * maximum;
 }
 
 // calcula estimativa
-void calcula_estimativa(vector<Job> jobs, int n, int r, vector< vector<int> > d) {
+int estimate_lower_bound(vector<Job> jobs, int n, int r, vector< vector<int> > d) {
     cout << "n: " << n << " r: " << r << endl;
 
-    vector<int> m(1, 1);
-    vector<int> tempo_1 = final_times_m1(jobs, m);
-    vector<int> tempo_2 = final_times_m2(jobs, m);
+    vector<int> m(1, 2);
+    vector<int> time_machine1 = final_times_m1(jobs, m);
+    vector<int> time_machine2 = final_times_m2(jobs, m);
 
-    cout << "TEMPO_1: " << endl;
-    for (int j = 0; j < n; j++) {
-        cout << tempo_1[j] << " ";
-    }
-    cout << endl;
+    int sum_times_machine2 = total_time_sum(jobs, m);
 
-    int s1 = calcula_S1(m, tempo_1, n, (int)m.size(), d[0], d[1]);
-    int s2 = calcula_S2(m, tempo_1, tempo_2, n, (int)m.size(), d[0], d[1]);
-    cout << "Resultado S1: " << s1 << endl << "Resultado S2: " << s2 << endl;
+    int value_s1 = s1(m, time_machine1, n, m.size(), d[0], d[1]);
+    int value_s2 = s2(m, time_machine1, time_machine2, n, m.size(), d[0], d[1]);
+    cout << "S1: " << value_s1 << ", S2: " << value_s2 << endl;
+
+    return sum_times_machine2 + max(value_s1, value_s2);
 }
