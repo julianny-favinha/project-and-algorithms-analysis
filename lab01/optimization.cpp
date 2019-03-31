@@ -157,17 +157,34 @@ int s2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> 
 }
 
 // calcula estimativa
-int estimate_lower_bound(vector<Job> jobs, int n, int r, vector< vector<int> > d) {
-    cout << "n: " << n << " r: " << r << endl;
+int estimate_lower_bound(vector<Job> jobs, vector<int> m, int r, vector< vector<int> > d) {
+    cout << "m: ";
+    for (int i = 0; i < m.size(); i++) {
+        cout << m[i] << " ";
+    }
+    cout << endl;
 
-    vector<int> m(1, 2);
     vector<int> time_machine1 = final_times_m1(jobs, m);
+
+    cout << "time_machine1: ";
+    for (int i = 0; i < time_machine1.size(); i++) {
+        cout << time_machine1[i] << " ";
+    }
+    cout << endl;
+
     vector<int> time_machine2 = final_times_m2(jobs, m);
 
-    int sum_times_machine2 = total_time_sum(jobs, m);
+    cout << "time_machine2: ";
+    for (int i = 0; i < time_machine2.size(); i++) {
+        cout << time_machine2[i] << " ";
+    }
+    cout << endl;
 
-    int value_s1 = s1(m, time_machine1, n, m.size(), d[0], d[1]);
-    int value_s2 = s2(m, time_machine1, time_machine2, n, m.size(), d[0], d[1]);
+    int sum_times_machine2 = total_time_sum(jobs, m);
+    cout << "sum_times_machine2: " << sum_times_machine2 << endl;
+
+    int value_s1 = s1(m, time_machine1, jobs.size(), m.size(), d[0], d[1]);
+    int value_s2 = s2(m, time_machine1, time_machine2, jobs.size(), m.size(), d[0], d[1]);
     cout << "S1: " << value_s1 << ", S2: " << value_s2 << endl;
 
     return sum_times_machine2 + max(value_s1, value_s2);
