@@ -5,9 +5,12 @@
 #include "input.hpp"
 
 struct BestSolution {
-    list<int> order;
+    vector<int> order;
     int sum;
 };
 
+vector<int> bound(vector<Job> jobs, vector<int> ordem, vector<int> restante);
+
+void branch_and_bound(vector<Job> jobs, vector<int> ordem, vector<int> restante);
 
 #endif /* bnb_fs_hpp */

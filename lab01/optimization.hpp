@@ -23,6 +23,6 @@ int s1(vector<int> m, vector<int> f, int n, int r, vector<int> time_machine1, ve
 int s2(vector<int> m, vector<int> f1, vector<int> f2, int n, int r, vector<int> time_machine1, vector<int> time_machine2);
 
 // calcula estimativa
-int estimate_lower_bound(vector<Job> jobs, int n, int r, vector< vector<int> > d);
+int estimate_lower_bound(vector<Job> jobs, vector<int> m, int r, vector< vector<int> > d);
 
 #endif /* optimization_hpp */

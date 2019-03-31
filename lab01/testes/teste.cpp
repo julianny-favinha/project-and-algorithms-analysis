@@ -7,123 +7,68 @@
 
 using namespace std;
 
-struct BestSolution {
-	list<int> order;
-	int sum;
+struct Job {
+    int time1;
+    int time2;
 };
 
-int print_stack(stack<int> stack_jobs) {
-	vector<int> jobs;
+vector< vector<int> > read_jobs_file(char *name) {
+    ifstream file;
+    file.open(name);
 
-	while (!stack_jobs.empty()) {
-		int elem = stack_jobs.top();
-		stack_jobs.pop();
-		jobs.push_back(elem);
-	}
+    int n;
+    file >> n;
 
-	cout << "PERMUTA ";
-	for(int i = jobs.size() - 1; i >= 0; i--) {
-		cout << jobs[i] << " ";
-	}
-	cout << endl;
+    vector<int> machine1(n);
+    vector<int> machine2(n);
 
-	return 0;
+    int time1;
+    int time2;
+    int i = 0;
+    while (file >> time1 >> time2) {
+        machine1[i] = time1;
+        machine2[i] = time2;
+        i++;
+    };
+
+    vector< vector<int> > d;
+
+    d.push_back(machine1);
+    d.push_back(machine2);
+
+    return d;
 }
 
-// void print(list<int> const &list) {
-// 	for (auto it = list.cbegin(); it != list.cend(); it++) {
-// 		cout << *it << " ";
-// 	}
+// void print_total_time(vector< vector<int> > d, vector<int> order) {
+//     int last_time_machine1 = 0;
+//     int last_time_machine2 = 0;
+//     int sum = 0;
 
-// 	cout << endl;
+//     for (int i = 0; i < order.size(); i++) {
+//         int machine = order[i];
+//         last_time_machine1 = last_time_machine1 + jobs[machine].time1;
+//         last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[machine].time2;
+//         sum += last_time_machine2;
+//         cout << "m1: " << last_time_machine1 << ", m2: " << last_time_machine2 << ", sum: " << sum << endl;
+//     }
+
+//     cout << "Time elapsed @ machine 2: " << sum << endl;
 // }
 
-int main() {
-	// int n = 3;
-	// vector< vector<int> > elements(n, vector<int>(n));
+int main(int argc, char *argv[]) {
+    char *input_file_name = argv[1];
+    char *param_file_name = argv[2];
 
-	// for (int i = 0; i < n; i++) {
-	// 	for (int j = 0; j < n; j++) {
-	// 		elements[i][j] = i-j;
-	// 	}
-	// }
+    vector< vector<int> > d = read_jobs_file(input_file_name);
 
-	// for (int i = 0; i < n; i++) {
-	// 	for (int j = 0; j < n; j++) {
-	// 		cout << elements[i][j] << " ";
-	// 	}
-	// 	cout << endl;
-	// }
+    for (int i = 0; i < d.size(); i++) {
+    	for (int j = 0; j < d[i].size(); j++) {
+    		cout << d[i][j] << " ";
+    	}
+    	cout << endl;
+    }
 
-	// sort(elements[1].begin(), elements[1].end());
-
-	// cout << "SORTING" << endl;
-	
-	// for (int i = 0; i < n; i++) {
-	// 	for (int j = 0; j < n; j++) {
-	// 		cout << elements[i][j] << " ";
-	// 	}
-	// 	cout << endl;
-	// }
-
-	// cout << "LINHA" << endl;
-	// vector<int> linha = elements[0];
-
-	// for (int j = 0; j < n; j++) {
-	// 	cout << linha[j] << " ";
-	// }
-	// cout << endl;
-
-	// int n = 3;
-	// vector<int> used(n, 0);
-
-	// vector<int> v;
-	// vector<int> u;
-
-	// for (int i = 0; i < 1000000000; i++) {
-	// 	v.push_back(1);
-	// }
-
-	// u = v;
-
-	// v[0] = 10;
-
-	// cout << v[0] << endl;
-	// cout << u[0] << endl;
-
-	// BestSolution solution = {list<int>(), -4};
-
-	// solution.order.push_back(1);
-	// solution.order.push_back(10);
-
-	// print(solution.order);
-
-	// cout << solution.sum << endl;
-
-	vector<int> linha1(3);
-	vector<int> linha2(3);
-
-	linha1[0] = 2;
-	linha1[1] = 3;	
-	linha1[2] = 2;
-
-
-	linha2[0] = 1;
-	linha2[1] = 1;	
-	linha2[2] = 3;
-
-	vector< vector<int> > matriz;
-
-	matriz.push_back(linha1);
-	matriz.push_back(linha2);
-
-	for (int i = 0; i < matriz.size(); i++) {
-		for (int j = 0; j < matriz[i].size(); j++) {
-			cout << matriz[i][j] << " ";
-		}
-		cout << endl;
-	}
-	cout << endl;
+    cout << "oi";
 
 	return 0;
 }
