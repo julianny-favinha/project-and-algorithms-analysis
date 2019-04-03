@@ -7,7 +7,13 @@ BestSolution best_solution = {vector<int>(), INT_MAX};
 int best_lower_bound = INT_MAX;
 
 // tempo de execucao do branch and bound
-clock_t tempo_inicio;
+clock_t start;
+
+// numero maximo de nos a serem explorados
+int max_nodes_count;
+
+// tempo maximo de execucao
+int max_time;
 
 // encontra melhores posicoes para continuar a recursao
 vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
@@ -102,36 +108,41 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
     }
 }
 
-int main(int argc, char *argv[]) {\
-    tempo_inicio = clock();
-
-    char *input_file_name = argv[1];
-    char *param_file_name = argv[2];
-
-    Input input = read_jobs_file(input_file_name);
-    vector<int> params = read_params_file(param_file_name);
-
-    vector<int> order;
-    order.reserve(input.count);
-    vector<int> remaining;
-    remaining.reserve(input.count);
-
-    for (int i = 0; i < input.count; i++) {
-        remaining.push_back(i);
-    }
-
-    branch_and_bound(input.jobs, input.count, order, remaining);
-
+void print_best_solution() {
     cout << "****ENCONTREI UMA MELHOR SOLUCAO****" << endl << "ORDEM: ";
     for (int i = 0; i < best_solution.order.size(); i++) {
         cout << best_solution.order[i] << " ";
     }
     cout << endl << "SOMA: " << best_solution.sum << endl;
+}
 
-    clock_t tempo_termino = clock();
+int main(int argc, char *argv[]) {\
+    start = clock();
 
-    printf("[CLOCK] Tempo total: %.5f segundos\n", ((tempo_termino - tempo_inicio) / (float)CLOCKS_PER_SEC));
+    char *jobs_file_name = argv[1];
+    char *params_file_name = argv[2];
 
+    Jobs jobs = read_jobs_file(jobs_file_name);
+    Params params = read_params_file(params_file_name);
+
+    max_nodes_count = params.max_nodes_count;
+    max_time = params.max_time;
+
+    vector<int> order;
+    order.reserve(jobs.count);
+    vector<int> remaining;
+    remaining.reserve(jobs.count);
+
+    for (int i = 0; i < jobs.count; i++) {
+        remaining.push_back(i);
+    }
+
+    branch_and_bound(jobs.jobs, jobs.count, order, remaining);
+
+    print_best_solution();
+
+    clock_t finish = clock();
+    printf("Total time: %.5fs\n", ((finish - start) / (float)CLOCKS_PER_SEC));
 
     return 0;
 }
