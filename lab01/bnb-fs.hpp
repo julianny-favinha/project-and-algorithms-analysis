@@ -13,4 +13,6 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
 
 void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining);
 
+void print_best_solution();
+
 #endif /* bnb_fs_hpp */

@@ -1,6 +1,6 @@
 #include "input.hpp"
 
-Input read_jobs_file(char *name) {
+Jobs read_jobs_file(char *name) {
     ifstream file;
     file.open(name);
 
@@ -24,40 +24,55 @@ Input read_jobs_file(char *name) {
     jobs.push_back(machine1);
     jobs.push_back(machine2);
 
-    Input input = {jobs, n};
+    Jobs input = {jobs, n};
     return input;
 }
 
 void print_jobs(vector< vector<int> > jobs) {
     for (int i = 0; i < jobs.size(); i++) {
+        cout << "Machine " << i+1 << endl;
         for (int j = 0; j < jobs[i].size(); j++) {
-            cout << jobs[i][j] << " ";
+            cout << "Job " << j+1 << ": " << jobs[i][j] << endl;
         }
         cout << endl;
     }
 }
 
-vector<int> read_params_file(char *name) {
+Params read_params_file(char *name) {
     ifstream file;
     file.open(name);
     
-    vector<int> items;
-    int item;
-    while (file >> item) {
-        items.push_back(item);
+    int max_nodes_count;
+    int max_time;
+
+    int value1;
+    int value2;
+
+    while (file >> value1 >> value2) {
+        max_nodes_count = value1;
+        max_time = value2;
     };
     
     file.close();
     
-    return items;
+    Params params = {max_nodes_count, max_time};
+    return params;
+}
+
+void print_params(Params params) {
+    cout << "Max number os nodes to be explored: " << params.max_nodes_count << endl;
+    cout << "Max time of execution: " << params.max_time << "s" <<  endl;
 }
 
 // int main(int argc, char *argv[]) {
-//     char *input_file_name = argv[1];
-//     char *param_file_name = argv[2];
+//     char *jobs_file_name = argv[1];
+//     char *params_file_name = argv[2];
 
-//     vector< vector<int> > d = read_jobs_file(input_file_name);
+//     Jobs jobs = read_jobs_file(jobs_file_name);
+//     Params params = read_params_file(params_file_name);
 
-//     print_jobs(d);
+//     print_jobs(jobs.jobs);
+//     print_params(params);
+
 //     return 0;
 // }

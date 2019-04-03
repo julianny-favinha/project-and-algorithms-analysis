@@ -15,17 +15,25 @@
 
 using namespace std;
 
-struct Input {
+struct Jobs {
 	vector< vector<int> > jobs;
 	int count;
 };
 
+struct Params {
+	int max_nodes_count;
+	int max_time;
+};
+
 // le o aqruivo com as tarefas
-Input read_jobs_file(char *name);
+Jobs read_jobs_file(char *name);
 
 // imprime o vetor com as tarefas
 void print_jobs(vector< vector<int> > jobs);
 
-vector<int> read_params_file(char *name);
+// le o arquivo com o numero maximo de nos a serem explorados na arvore e o tempo maximo de execucao
+Params read_params_file(char *name);
+
+void print_params(Params params);
 
 #endif /* input_hpp */
