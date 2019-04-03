@@ -69,6 +69,12 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
 
     if (order.size() < n-1) {
         vector<int> melhores_posicoes = bound(jobs, n, order, remaining);
+        // cout << melhores_posicoes.size();
+        if (melhores_posicoes.size() > max_nodes_count) {
+            cout << "LIMITE DE NOS ATINGIDO: melhores_posicoes.size() = " << melhores_posicoes.size() << " e max_nodes_count = " << max_nodes_count << endl;
+            print_best_solution();
+            exit(0);
+        }
 
         for (int i = 0; i < melhores_posicoes.size(); i++) {
             int elemento = melhores_posicoes[i];
