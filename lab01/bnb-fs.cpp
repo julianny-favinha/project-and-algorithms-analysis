@@ -15,6 +15,8 @@ int max_nodes_count;
 // tempo maximo de execucao
 int max_time;
 
+int max_nodes_visiteds = 0;
+
 // encontra melhores posicoes para continuar a recursao
 vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
     int melhor_estimativa = INT_MAX;
@@ -70,6 +72,9 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
     if (order.size() < n-1) {
         vector<int> melhores_posicoes = bound(jobs, n, order, remaining);
         // cout << melhores_posicoes.size();
+        if (max_nodes_visiteds < melhores_posicoes.size()) {
+            max_nodes_visiteds = melhores_posicoes.size();
+        }
         if (melhores_posicoes.size() > max_nodes_count) {
             cout << "LIMITE DE NOS ATINGIDO: melhores_posicoes.size() = " << melhores_posicoes.size() << " e max_nodes_count = " << max_nodes_count << endl;
             print_best_solution();
@@ -148,7 +153,8 @@ int main(int argc, char *argv[]) {\
     print_best_solution();
 
     clock_t finish = clock();
-    printf("Total time: %.5fs\n", ((finish - start) / (float)CLOCKS_PER_SEC));
+    printf("%s,<primal>,%d,%d,<t-primal>,<t-dual>,%.5fs\n", jobs_file_name, best_lower_bound, max_nodes_visiteds, ((finish - start) / (float)CLOCKS_PER_SEC));
+//    printf("Total time: %.5fs\n", ((finish - start) / (float)CLOCKS_PER_SEC));
 
     return 0;
 }
