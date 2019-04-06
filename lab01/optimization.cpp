@@ -1,7 +1,7 @@
 #include "optimization.hpp"
 
 // retorna soma total na maquina 2
-int total_time_sum(vector< vector<int> > jobs, vector<int> order) {
+int total_time_sum(vector< vector<int> > &jobs, vector<int> order) {
     int last_time_machine1 = 0;
     int last_time_machine2 = 0;
     int sum = 0;
@@ -16,7 +16,7 @@ int total_time_sum(vector< vector<int> > jobs, vector<int> order) {
 }
 
 // retorna vector de tempos finais na maquina 1
-vector<int> final_times_m1(vector< vector<int> > jobs, vector<int> order) {
+vector<int> final_times_m1(vector< vector<int> > &jobs, vector<int> order) {
     vector<int> final_times(order.size());
 
     int last_time_machine1 = 0;
@@ -30,7 +30,7 @@ vector<int> final_times_m1(vector< vector<int> > jobs, vector<int> order) {
 }
 
 // retorna vector de tempos finais na maquina 2
-vector<int> final_times_m2(vector< vector<int> > jobs, vector<int> order) {
+vector<int> final_times_m2(vector< vector<int> > &jobs, vector<int> order) {
     vector<int> final_times(order.size());
 
     int last_time_machine1 = 0;
@@ -45,26 +45,20 @@ vector<int> final_times_m2(vector< vector<int> > jobs, vector<int> order) {
     return final_times;
 }
 
-static void initialize(vector<int> &d0, vector<int> &d1, vector<int> &order, int n, vector<int> &time_machine1, vector<int> &time_machine2) {
-    d0 = vector<int>(n - order.size());
-    d1 = vector<int>(n - order.size());
-
-    for (int i = 0; i < order.size(); i++) {
-        time_machine1[order[i]] = -1;
-    }
+static void initialize(vector<int> &d0, vector<int> &d1, vector<int> &order, int n, vector<int> &remaining, vector<int> &time_machine1, vector<int> &time_machine2) {
+    d0 = vector<int>(remaining.size());
+    d1 = vector<int>(remaining.size());
 
     int k = 0;
-    for (int i = 0; i < time_machine1.size(); i++) {
-        if (time_machine1[i] != -1) {
-            d0[k] = time_machine1[i];
-            d1[k] = time_machine2[i];
-            k++;
-        }
+    for (int i = 0; i < remaining.size(); i++) {
+        d0[k] = time_machine1[remaining[i]];
+        d1[k] = time_machine2[remaining[i]];
+        k++;
     }
 }
 
 // calcula S1
-int s1(vector< vector<int> > jobs, int n, vector<int> order, vector<int> final_times_machine1) {
+int s1(vector< vector<int> > &jobs, int n, vector<int> order, vector<int> remaining, vector<int> final_times_machine1) {
     int value = 0;
     int r = order.size();
 
@@ -88,7 +82,7 @@ int s1(vector< vector<int> > jobs, int n, vector<int> order, vector<int> final_t
 
     vector<int> d0;
     vector<int> d1;
-    initialize(d0, d1, order, n, jobs[0], jobs[1]);
+    initialize(d0, d1, order, n, remaining, jobs[0], jobs[1]);
 
     // cout << "d0 ANTES DE ORDENAR" << endl;
     // for (int i = 0; i < d0.size(); i++) {
@@ -119,13 +113,13 @@ int s1(vector< vector<int> > jobs, int n, vector<int> order, vector<int> final_t
 }
 
 // calcula S2
-int s2(vector< vector<int> > jobs, int n, vector<int> order, vector<int> final_times_machine1, vector<int> final_times_machine2) {
+int s2(vector< vector<int> > &jobs, int n, vector<int> order, vector<int> remaining, vector<int> final_times_machine1, vector<int> final_times_machine2) {
     int value = 0;
     int r = order.size();
 
     vector<int> d0;
     vector<int> d1;
-    initialize(d0, d1, order, n, jobs[0], jobs[1]);
+    initialize(d0, d1, order, n, remaining, jobs[0], jobs[1]);
 
     sort(d0.begin(), d0.end());
     sort(d1.begin(), d1.end());
@@ -141,7 +135,7 @@ int s2(vector< vector<int> > jobs, int n, vector<int> order, vector<int> final_t
 }
 
 // calcula estimativa
-int estimate_lower_bound(vector< vector<int> > jobs, int n, vector<int> order) {
+int estimate_bound(vector< vector<int> > &jobs, int n, vector<int> order, vector<int> remaining) {
     // cout << "m: ";
     // for (int i = 0; i < m.size(); i++) {
     //     cout << m[i] << " ";
@@ -165,8 +159,13 @@ int estimate_lower_bound(vector< vector<int> > jobs, int n, vector<int> order) {
     int sum_times_machine2 = total_time_sum(jobs, order);
     // cout << "/ sum_times_machine2: " << sum_times_machine2 << endl;
 
-    int value_s1 = s1(jobs, n, order, time_machine1);
-    int value_s2 = s2(jobs, n, order, time_machine1, time_machine2);
+    int value_s1 = s1(jobs, n, order, remaining, time_machine1);
+    int value_s2 = s2(jobs, n, order, remaining, time_machine1, time_machine2);
     // cout << "s1: " << value_s1 << ", s2: " << value_s2 << endl;
-    return sum_times_machine2 + max(value_s1, value_s2);
+
+    int estimate_lower_bound = sum_times_machine2 + max(value_s1, value_s2);
+    // int estimate_upper_bound = -1;
+
+    // Bounds bounds = {estimate_lower_bound, estimate_upper_bound};
+    return estimate_lower_bound;
 }
