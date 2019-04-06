@@ -4,17 +4,14 @@
 char *jobs_file_name;
 char *params_file_name;
 
-// melhor solucao ate o momento
-BestSolution best_solution = {vector<int>(), INT_MAX};
-
 // melhor limitante dual ate o momento
-int best_lower_bound = INT_MAX;
+int best_dual = INT_MAX;
 
 // tempo no qual melhor limitante dual foi obtido
 clock_t time_best_lower_bound;
 
 // melhor limitante primal ate o momento
-int best_upper_bound = 0;
+int best_primal = INT_MAX;
 
 // tempo no qual melhor limitante primal foi obtido
 clock_t time_best_upper_bound;
@@ -34,9 +31,11 @@ int nodes_visited_count = 0;
 
 // encontra melhores posicoes para continuar a recursao
 vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
-    int melhor_estimativa = INT_MAX;
     vector<int> melhores_posicoes;
     melhores_posicoes.reserve(n);
+
+    vector<int> lowers;
+    lowers.reserve(remaining.size());
 
     for (int i = 0; i < remaining.size(); i++) {
         int elemento = remaining[i];
@@ -47,25 +46,36 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
         vector<int> new_remaining = remaining;
         new_remaining.erase(new_remaining.begin() + i);
 
-        // int estimativa_do_elemento = estimate_lower_bound(jobs, n, new_order);
-        int estimativa_do_elemento = estimate_bound(jobs, n, new_order, new_remaining);
+        Bounds bounds = estimate_bounds(jobs, n, new_order, new_remaining);
+        lowers.push_back(bounds.lower_bound);
 
-        if (estimativa_do_elemento == melhor_estimativa) {
+        if (bounds.upper_bound < best_primal) {
+            best_primal = bounds.upper_bound;
+            time_best_upper_bound = clock();
+        }
+    }
+
+    int melhor_estimativa_lower_bound = best_primal;
+
+    for (int i = 0; i < lowers.size(); i++) {
+        int elemento = remaining[i];
+
+        // cout << lowers[i] << " " << melhor_estimativa_lower_bound << endl;
+
+        if (lowers[i] == melhor_estimativa_lower_bound) {
             melhores_posicoes.push_back(elemento);
         } else {
-            if (estimativa_do_elemento < melhor_estimativa) {
-                melhor_estimativa = estimativa_do_elemento;
+            if (lowers[i] < melhor_estimativa_lower_bound) {
+                melhor_estimativa_lower_bound = lowers[i];
                 melhores_posicoes.clear();
                 melhores_posicoes.push_back(elemento);
-            }
+            }      
+        }
 
-            if (estimativa_do_elemento < best_lower_bound) {
-                best_lower_bound = estimativa_do_elemento;
-                // cout << "****** Novo best_lower_bound: " << best_lower_bound << endl;
-                
-                time_best_lower_bound = clock();
-            }
-        }    
+        if (lowers[i] < best_dual) {
+            best_dual = lowers[i];                
+            time_best_lower_bound = clock();
+        }  
     }
 
     // cout << "melhores_posicoes: ";
@@ -140,14 +150,9 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
         int soma = total_time_sum(jobs, order);
         // cout << "Soma folha: " << soma << endl;
 
-        if (soma == best_lower_bound) {
-            best_solution.sum = soma;
-            best_solution.order = order;
-        }
-
-        if (soma < best_solution.sum) {
-            best_solution.sum = soma;
-            best_solution.order = order;
+        if (soma < best_primal) {
+            best_primal = soma;
+            time_best_upper_bound = clock();
         }
     }
 }
@@ -156,8 +161,9 @@ void print_best_solution() {
     clock_t finish = clock();
     double total_time_execution = ((finish - start) / (float)CLOCKS_PER_SEC);
     double total_time_best_lower_bound = ((time_best_lower_bound - start) / (float)CLOCKS_PER_SEC);
+    double total_time_best_upper_bound = ((time_best_upper_bound - start) / (float)CLOCKS_PER_SEC);
 
-    printf("%s,<primal>,%d,%d,<t-primal>,%.2f,%.2f\n", jobs_file_name, best_lower_bound, nodes_visited_count, total_time_best_lower_bound, total_time_execution);
+    printf("%s,%d,%d,%d,%.2f,%.2f,%.2f\n", jobs_file_name, best_primal, best_dual, nodes_visited_count, total_time_best_upper_bound, total_time_best_lower_bound, total_time_execution);
 }
 
 int main(int argc, char *argv[]) {
