@@ -1,21 +1,36 @@
 #include "bnb-fs.hpp"
 
+// nomes dos arquivos de entrada
+char *jobs_file_name;
+char *params_file_name;
+
 // melhor solucao ate o momento
 BestSolution best_solution = {vector<int>(), INT_MAX};
 
 // melhor limitante dual ate o momento
 int best_lower_bound = INT_MAX;
 
-// tempo de execucao do branch and bound
-clock_t start;
+// tempo no qual melhor limitante dual foi obtido
+clock_t time_best_lower_bound;
 
-// numero maximo de nos a serem explorados
-int max_nodes_count;
+// melhor limitante primal ate o momento
+int best_upper_bound = 0;
+
+// tempo no qual melhor limitante primal foi obtido
+clock_t time_best_upper_bound;
+
+// tempo de inicio de execucao
+clock_t start;
 
 // tempo maximo de execucao
 int max_time;
 
-int max_nodes_visiteds = 0;
+// numero maximo de nos a serem explorados
+int max_nodes_count;
+int active_nodes_count = 0;
+
+// numero de nos explorados
+int nodes_visited_count = 0;
 
 // encontra melhores posicoes para continuar a recursao
 vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
@@ -43,6 +58,8 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
             if (estimativa_do_elemento < best_lower_bound) {
                 best_lower_bound = estimativa_do_elemento;
                 // cout << "****** Novo best_lower_bound: " << best_lower_bound << endl;
+                
+                time_best_lower_bound = clock();
             }
         }    
     }
@@ -56,7 +73,7 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
     return melhores_posicoes;
 }
 
-// // recursao
+// recursao
 void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
     // cout << "order: ";
     // for (int i = 0; i < order.size(); i++) {
@@ -69,11 +86,23 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
     // }
     // cout << endl;
     if (order.size() < n-1) {
-        vector<int> melhores_posicoes = bound(jobs, n, order, remaining);
-        // cout << melhores_posicoes.size();
+        // cout << "order" << endl;
+        // for (int i = 0; i < order.size(); i++) {
+        //     cout << order[i] << " ";
+        // }
+        // cout << endl;
 
-        if (melhores_posicoes.size() > max_nodes_count) {
-            cout << "LIMITE DE NOS ATINGIDO: melhores_posicoes.size() = " << melhores_posicoes.size() << " e max_nodes_count = " << max_nodes_count << endl;
+        vector<int> melhores_posicoes = bound(jobs, n, order, remaining);
+        // cout << "melhores_posicoes" << endl;
+        // for (int i = 0; i < melhores_posicoes.size(); i++) {
+        //     cout << melhores_posicoes[i] << " ";
+        // }
+        // cout << endl;
+        // // cout << melhores_posicoes.size();
+        // active_nodes_count += melhores_posicoes.size();
+
+        if (active_nodes_count > max_nodes_count) {
+            cout << "ULTRAPASSOU MAX NODES COUNT COM: " << active_nodes_count << endl;
             print_best_solution();
             exit(0);
         }
@@ -91,7 +120,10 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
 
             order.push_back(elemento);
             remaining.erase(remaining.begin() + index);
-            max_nodes_visiteds++;
+            nodes_visited_count++;
+
+            active_nodes_count -= 1;
+
             branch_and_bound(jobs, n, order, remaining);
 
             order.pop_back();
@@ -117,18 +149,18 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
 }
 
 void print_best_solution() {
-    cout << "****ENCONTREI UMA MELHOR SOLUCAO****" << endl << "ORDEM: ";
-    for (int i = 0; i < best_solution.order.size(); i++) {
-        cout << best_solution.order[i] << " ";
-    }
-    cout << endl << "SOMA: " << best_solution.sum << endl;
+    clock_t finish = clock();
+    double total_time_execution = ((finish - start) / (float)CLOCKS_PER_SEC);
+    double total_time_best_lower_bound = ((time_best_lower_bound - start) / (float)CLOCKS_PER_SEC);
+
+    printf("%s,<primal>,%d,%d,<t-primal>,%.2f,%.2f\n", jobs_file_name, best_lower_bound, nodes_visited_count, total_time_best_lower_bound, total_time_execution);
 }
 
-int main(int argc, char *argv[]) {\
+int main(int argc, char *argv[]) {
     start = clock();
 
-    char *jobs_file_name = argv[1];
-    char *params_file_name = argv[2];
+    jobs_file_name = argv[1];
+    params_file_name = argv[2];
 
     Jobs jobs = read_jobs_file(jobs_file_name);
     Params params = read_params_file(params_file_name);
@@ -148,10 +180,6 @@ int main(int argc, char *argv[]) {\
     branch_and_bound(jobs.jobs, jobs.count, order, remaining);
 
     print_best_solution();
-
-    clock_t finish = clock();
-    printf("%s,<primal>,%d,%d,<t-primal>,<t-dual>,%.5fs\n", jobs_file_name, best_lower_bound, max_nodes_visiteds, ((finish - start) / (float)CLOCKS_PER_SEC));
-//    printf("Total time: %.5fs\n", ((finish - start) / (float)CLOCKS_PER_SEC));
 
     return 0;
 }

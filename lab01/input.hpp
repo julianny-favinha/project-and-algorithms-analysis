@@ -25,6 +25,11 @@ struct Params {
 	int max_time;
 };
 
+struct BestSolution {
+    vector<int> order;
+    int sum;
+};
+
 // le o aqruivo com as tarefas
 Jobs read_jobs_file(char *name);
 
