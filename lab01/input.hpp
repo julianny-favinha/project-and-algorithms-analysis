@@ -20,6 +20,19 @@ struct Jobs {
 	int count;
 };
 
+struct JobsMachine {
+	int number;
+	int time1;
+	int time2;
+};
+
+// struct JobsMachine2 {
+// 	int number;
+// 	int time2;
+
+// 	bool operator<(const JobsMachine2 &rhs) const { time2 < rhs.time2; }
+// }
+
 struct Params {
 	int max_nodes_count;
 	int max_time;

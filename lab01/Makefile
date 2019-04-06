@@ -1,5 +1,5 @@
 CPP=g++
-FLAGS=-O3
+FLAGS=-O3 -Wall -Werror
 TARGET=bnb-fs
 FILES=bnb-fs.cpp optimization.cpp input.cpp
 
