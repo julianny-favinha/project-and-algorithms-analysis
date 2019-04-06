@@ -44,7 +44,11 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
         vector<int> new_order = order;
         new_order.push_back(elemento);
 
-        int estimativa_do_elemento = estimate_lower_bound(jobs, n, new_order);
+        vector<int> new_remaining = remaining;
+        new_remaining.erase(new_remaining.begin() + i);
+
+        // int estimativa_do_elemento = estimate_lower_bound(jobs, n, new_order);
+        int estimativa_do_elemento = estimate_bound(jobs, n, new_order, new_remaining);
 
         if (estimativa_do_elemento == melhor_estimativa) {
             melhores_posicoes.push_back(elemento);

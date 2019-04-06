@@ -30,6 +30,11 @@ struct BestSolution {
     int sum;
 };
 
+struct Bounds {
+	int lower_bound;
+	int upper_bound;
+};
+
 // le o aqruivo com as tarefas
 Jobs read_jobs_file(char *name);
 
