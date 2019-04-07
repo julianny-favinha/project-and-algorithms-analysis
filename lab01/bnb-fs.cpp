@@ -115,10 +115,10 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
         // // cout << melhores_posicoes.size();
         // active_nodes_count += melhores_posicoes.size();
 
-        if (active_nodes_count > max_nodes_count) {
-            cout << "ULTRAPASSOU MAX NODES COUNT COM: " << active_nodes_count << endl;
+        if (nodes_visited_count > max_nodes_count) {
+            cout << "ULTRAPASSOU MAX NODES COUNT COM: " << nodes_visited_count << endl;
             print_best_solution();
-            exit(0);
+            exit(EXIT_FAILURE);
         }
 
         for (int i = 0; i < melhores_posicoes.size(); i++) {
