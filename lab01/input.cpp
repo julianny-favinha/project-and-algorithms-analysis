@@ -41,9 +41,9 @@ void print_jobs(vector< vector<int> > jobs) {
 Params read_params_file(char *name) {
     ifstream file;
     file.open(name);
-    
-    int max_nodes_count;
-    int max_time;
+
+    int max_nodes_count = 0;
+    int max_time = 0;
 
     int value1;
     int value2;
@@ -52,9 +52,9 @@ Params read_params_file(char *name) {
         max_nodes_count = value1;
         max_time = value2;
     };
-    
+
     file.close();
-    
+
     Params params = {max_nodes_count, max_time};
     return params;
 }

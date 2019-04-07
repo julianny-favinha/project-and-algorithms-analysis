@@ -95,13 +95,13 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
                 best_estimative = lowers[i];
                 best_positions.clear();
                 best_positions.push_back(job);
-            }      
+            }
         }
 
         if (lowers[i] < best_dual) {
-            best_dual = lowers[i];                
+            best_dual = lowers[i];
             time_best_dual = clock();
-        }  
+        }
     }
 
     // cout << "best_positions: ";
