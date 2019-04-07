@@ -6,7 +6,7 @@
 
 vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining);
 
-void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining);
+void branch(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining);
 
 void print_best_solution();
 

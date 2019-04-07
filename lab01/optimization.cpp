@@ -2,7 +2,6 @@
 
 int estimate_upper_bound = INT_MAX;
 
-// retorna soma total na maquina 2
 int total_time_sum(vector< vector<int> > &jobs, vector<int> order) {
     int last_time_machine1 = 0;
     int last_time_machine2 = 0;
@@ -17,7 +16,6 @@ int total_time_sum(vector< vector<int> > &jobs, vector<int> order) {
     return sum;
 }
 
-// retorna os tempos finais na maquina 1
 vector<int> final_times_m1(vector< vector<int> > &jobs, vector<int> order) {
     vector<int> final_times(order.size());
 
@@ -31,7 +29,6 @@ vector<int> final_times_m1(vector< vector<int> > &jobs, vector<int> order) {
     return final_times;
 }
 
-// retorna os tempos finais na maquina 2
 vector<int> final_times_m2(vector< vector<int> > &jobs, vector<int> order) {
     vector<int> final_times(order.size());
 
@@ -55,7 +52,7 @@ bool compare_two_jobs_machine2(JobsMachine lhs, JobsMachine rhs) {
     return lhs.time2 < rhs.time2;
 }
 
-vector<JobsMachine> monta_estrutura(vector< vector<int> > &jobs, vector<int> &remaining) {
+vector<JobsMachine> build_jobs_machine(vector< vector<int> > &jobs, vector<int> &remaining) {
     vector<JobsMachine> jobs_machine(remaining.size());
 
     for (int i = 0; i < remaining.size(); i++) {
@@ -84,7 +81,6 @@ void update_upper_bound(vector< vector<int> > &jobs, int n, vector<int> order, v
     }
 }
 
-// calcula S1
 int s1(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vector<int> order, vector<int> remaining, vector<int> final_times_machine1) {
     sort(jobs_machine.begin(), jobs_machine.end(), compare_two_jobs_machine1);
 
@@ -108,7 +104,6 @@ int s1(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vec
     return value;
 }
 
-// calcula S2
 int s2(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vector<int> order, vector<int> remaining, vector<int> final_times_machine1, vector<int> final_times_machine2) {
     int value = 0;
     int r = order.size();
@@ -139,14 +134,13 @@ int s2(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vec
     return value + (n-r) * maximum;
 }
 
-// calcula estimativa
 Bounds estimate_bounds(vector< vector<int> > &jobs, int n, vector<int> order, vector<int> remaining) {
     vector<int> time_machine1 = final_times_m1(jobs, order);
     vector<int> time_machine2 = final_times_m2(jobs, order);
 
     int sum_times_machine2 = total_time_sum(jobs, order);
 
-    vector<JobsMachine> jobs_machine = monta_estrutura(jobs, remaining);
+    vector<JobsMachine> jobs_machine = build_jobs_machine(jobs, remaining);
 
     int value_s1 = s1(jobs, n, jobs_machine, order, remaining, time_machine1);
     int value_s2 = s2(jobs, n, jobs_machine, order, remaining, time_machine1, time_machine2);

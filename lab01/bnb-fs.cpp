@@ -105,8 +105,7 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
     return best_positions;
 }
 
-// recursao
-void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
+void branch(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
     if (time_expired()) {
         cout << "EXPIROU O TEMPO MAX: " << max_time << endl;
         print_best_solution();
@@ -141,7 +140,7 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
             nodes_visited_count++;
             active_nodes_count -= 1;
 
-            branch_and_bound(jobs, n, order, remaining);
+            branch(jobs, n, order, remaining);
 
             order.pop_back();
             remaining.push_back(job);
@@ -195,7 +194,7 @@ int main(int argc, char *argv[]) {
         remaining.push_back(i);
     }
 
-    branch_and_bound(jobs.jobs, jobs.count, order, remaining);
+    branch(jobs.jobs, jobs.count, order, remaining);
 
     print_best_solution();
 
