@@ -7,7 +7,7 @@ int total_time_sum(vector< vector<int> > &jobs, vector<int> order) {
     int last_time_machine2 = 0;
     int sum = 0;
 
-    for (int i = 0; i < order.size(); i++) {
+    for (int i = 0; i < (int)order.size(); i++) {
         last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
         last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[1][order[i]];
         sum += last_time_machine2;
@@ -21,7 +21,7 @@ vector<int> final_times_m1(vector< vector<int> > &jobs, vector<int> order) {
 
     int last_time_machine1 = 0;
 
-    for (int i = 0; i < order.size(); i++) {
+    for (int i = 0; i < (int)order.size(); i++) {
         last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
         final_times[i] = last_time_machine1;
     }
@@ -35,7 +35,7 @@ vector<int> final_times_m2(vector< vector<int> > &jobs, vector<int> order) {
     int last_time_machine1 = 0;
     int last_time_machine2 = 0;
 
-    for (int i = 0; i < order.size(); i++) {
+    for (int i = 0; i < (int)order.size(); i++) {
         last_time_machine1 = last_time_machine1 + jobs[0][order[i]];
         last_time_machine2 = max(last_time_machine2, last_time_machine1) + jobs[1][order[i]];
         final_times[i] = last_time_machine2;
@@ -55,7 +55,7 @@ bool compare_two_jobs_machine2(JobsMachine lhs, JobsMachine rhs) {
 vector<JobsMachine> build_jobs_machine(vector< vector<int> > &jobs, vector<int> &remaining) {
     vector<JobsMachine> jobs_machine(remaining.size());
 
-    for (int i = 0; i < remaining.size(); i++) {
+    for (int i = 0; i < (int)remaining.size(); i++) {
         JobsMachine jobsMachine = {remaining[i], jobs[0][remaining[i]], jobs[1][remaining[i]]};
         jobs_machine[i] = jobsMachine;
     }
@@ -67,7 +67,7 @@ void update_upper_bound(vector< vector<int> > &jobs, int n, vector<int> order, v
     vector<int> scheduling;
     vector<int> remaining(jobs_machine.size());
 
-    for (int i = 0; i < jobs_machine.size(); i++) {
+    for (int i = 0; i < (int)jobs_machine.size(); i++) {
         remaining[i] = jobs_machine[i].number;
     }
 
@@ -87,7 +87,7 @@ int s1(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vec
     vector<int> d0(remaining.size());
     vector<int> d1(remaining.size());
 
-    for (int i = 0; i < jobs_machine.size(); i++) {
+    for (int i = 0; i < (int)jobs_machine.size(); i++) {
         d0[i] = jobs_machine[i].time1;
         d1[i] = jobs_machine[i].time2;
     }
@@ -95,7 +95,7 @@ int s1(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vec
     update_upper_bound(jobs, n, order, jobs_machine);
 
     int value = 0;
-    int r = order.size();
+    int r = (int)order.size();
 
     for (int k = r; k < n; k++) {
         value += final_times_machine1[r-1] + (n-k) * d0[k-r] + d1[k-r];
@@ -106,19 +106,19 @@ int s1(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vec
 
 int s2(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vector<int> order, vector<int> remaining, vector<int> final_times_machine1, vector<int> final_times_machine2) {
     int value = 0;
-    int r = order.size();
+    int r = (int)order.size();
 
     sort(jobs_machine.begin(), jobs_machine.end(), compare_two_jobs_machine1);
 
     vector<int> d0(remaining.size());
-    for (int i = 0; i < jobs_machine.size(); i++) {
+    for (int i = 0; i < (int)jobs_machine.size(); i++) {
         d0[i] = jobs_machine[i].time1;
     }
 
     sort(jobs_machine.begin(), jobs_machine.end(), compare_two_jobs_machine2);
 
     vector<int> d1(remaining.size());
-    for (int i = 0; i < jobs_machine.size(); i++) {
+    for (int i = 0; i < (int)jobs_machine.size(); i++) {
         d1[i] = jobs_machine[i].time2;
     }
 
