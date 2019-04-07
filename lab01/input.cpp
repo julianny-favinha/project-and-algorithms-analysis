@@ -29,9 +29,9 @@ Jobs read_jobs_file(char *name) {
 }
 
 void print_jobs(vector< vector<int> > jobs) {
-    for (int i = 0; i < jobs.size(); i++) {
+    for (int i = 0; i < (int)jobs.size(); i++) {
         cout << "Machine " << i+1 << endl;
-        for (int j = 0; j < jobs[i].size(); j++) {
+        for (int j = 0; j < (int)jobs[i].size(); j++) {
             cout << "Job " << j+1 << ": " << jobs[i][j] << endl;
         }
         cout << endl;

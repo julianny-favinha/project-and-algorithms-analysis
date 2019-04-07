@@ -54,7 +54,7 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
     vector<int> lowers;
     lowers.reserve(remaining.size());
 
-    for (int i = 0; i < remaining.size(); i++) {
+    for (int i = 0; i < (int)remaining.size(); i++) {
         int job = remaining[i];
 
         vector<int> new_order = order;
@@ -83,7 +83,7 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
 
     int best_estimative = best_primal;
 
-    for (int i = 0; i < lowers.size(); i++) {
+    for (int i = 0; i < (int)lowers.size(); i++) {
         int job = remaining[i];
 
         if (lowers[i] == best_estimative) {
@@ -112,7 +112,7 @@ void branch(vector< vector<int> > jobs, int n, vector<int> order, vector<int> re
         exit(0);
     }
 
-    if (order.size() < n-1) {
+    if ((int)order.size() < n-1) {
         vector<int> best_positions = bound(jobs, n, order, remaining);
 
         active_nodes_count += best_positions.size();
@@ -123,12 +123,12 @@ void branch(vector< vector<int> > jobs, int n, vector<int> order, vector<int> re
             exit(EXIT_FAILURE);
         }
 
-        for (int i = 0; i < best_positions.size(); i++) {
+        for (int i = 0; i < (int)best_positions.size(); i++) {
             int job = best_positions[i];
 
             // encontra posicao para remover job
             int index = 0;
-            for (index = 0; index < remaining.size(); index++) {
+            for (index = 0; index < (int)remaining.size(); index++) {
                 if (remaining[index] == job) {
                     break;
                 }
