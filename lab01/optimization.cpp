@@ -88,11 +88,6 @@ void update_upper_bound(vector< vector<int> > &jobs, int n, vector<int> order, v
 int s1(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vector<int> order, vector<int> remaining, vector<int> final_times_machine1) {
     sort(jobs_machine.begin(), jobs_machine.end(), compare_two_jobs_machine1);
 
-    // cout << "NOVA ESTRUTURA DEPOIS DE ORDERNAR" << endl;
-    // for (int i = 0; i < jobs_machine.size(); i++) {
-    //     cout << jobs_machine[i].number << " " << jobs_machine[i].time1 << " " << jobs_machine[i].time2 << endl;
-    // }
-
     vector<int> d0(remaining.size());
     vector<int> d1(remaining.size());
 
@@ -147,29 +142,14 @@ int s2(vector< vector<int> > &jobs, int n, vector<JobsMachine> jobs_machine, vec
 // calcula estimativa
 Bounds estimate_bounds(vector< vector<int> > &jobs, int n, vector<int> order, vector<int> remaining) {
     vector<int> time_machine1 = final_times_m1(jobs, order);
-    // cout << "time_machine1: ";
-    // for (int i = 0; i < time_machine1.size(); i++) {
-    //     cout << time_machine1[i] << " ";
-    // }
-
     vector<int> time_machine2 = final_times_m2(jobs, order);
-    // cout << "/ time_machine2: ";
-    // for (int i = 0; i < time_machine2.size(); i++) {
-    //     cout << time_machine2[i] << " ";
-    // }
 
     int sum_times_machine2 = total_time_sum(jobs, order);
-    // cout << "/ sum_times_machine2: " << sum_times_machine2 << endl;
 
     vector<JobsMachine> jobs_machine = monta_estrutura(jobs, remaining);
-    // cout << "NOVA ESTRUTURA" << endl;
-    // for (int i = 0; i < jobs_machine.size(); i++) {
-    //     cout << jobs_machine[i].number << " " << jobs_machine[i].time1 << " " << jobs_machine[i].time2 << endl;
-    // }
 
     int value_s1 = s1(jobs, n, jobs_machine, order, remaining, time_machine1);
     int value_s2 = s2(jobs, n, jobs_machine, order, remaining, time_machine1, time_machine2);
-    // cout << "s1: " << value_s1 << ", s2: " << value_s2 << endl;
 
     int estimate_lower_bound = sum_times_machine2 + max(value_s1, value_s2);
 
