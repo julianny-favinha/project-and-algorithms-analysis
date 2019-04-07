@@ -86,8 +86,6 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
     for (int i = 0; i < lowers.size(); i++) {
         int job = remaining[i];
 
-        // cout << lowers[i] << " " << best_estimative << endl;
-
         if (lowers[i] == best_estimative) {
             best_positions.push_back(job);
         } else {
@@ -104,12 +102,6 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
         }
     }
 
-    // cout << "best_positions: ";
-    // for (int i = 0; i < best_positions.size(); i++) {
-    //     cout << best_positions[i] << " ";
-    // }
-    // cout << endl;
-
     return best_positions;
 }
 
@@ -121,24 +113,9 @@ void branch_and_bound(vector< vector<int> > jobs, int n, vector<int> order, vect
         exit(0);
     }
 
-    // cout << "order: ";
-    // for (int i = 0; i < order.size(); i++) {
-    //     cout << order[i] << " ";
-    // }
-
-    // cout << "/ remaining: ";
-    // for (int i = 0; i < remaining.size(); i++) {
-    //     cout << remaining[i] << " ";
-    // }
-    // cout << endl;
     if (order.size() < n-1) {
         vector<int> best_positions = bound(jobs, n, order, remaining);
-        // cout << "best_positions" << endl;
-        // for (int i = 0; i < best_positions.size(); i++) {
-        //     cout << best_positions[i] << " ";
-        // }
-        // cout << endl;
-        // // cout << best_positions.size();
+
         active_nodes_count += best_positions.size();
 
         if (active_nodes_count > max_nodes_count) {
