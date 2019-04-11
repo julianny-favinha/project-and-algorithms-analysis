@@ -43,7 +43,6 @@ bool time_expired() {
 // encontra melhores posicoes para continuar a recursao
 vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
     if (time_expired()) {
-        cout << "EXPIROU O TEMPO MAX: " << max_time << endl;
         print_best_solution();
         exit(0);
     }
@@ -67,7 +66,6 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
         Bounds bounds = estimate_bounds(jobs, n, new_order, new_remaining);
 
         if (time_expired()) {
-            cout << "EXPIROU O TEMPO MAX: " << max_time << endl;
             print_best_solution();
             exit(0);
         }
@@ -107,7 +105,6 @@ vector<int> bound(vector< vector<int> > jobs, int n, vector<int> order, vector<i
 
 void branch(vector< vector<int> > jobs, int n, vector<int> order, vector<int> remaining) {
     if (time_expired()) {
-        cout << "EXPIROU O TEMPO MAX: " << max_time << endl;
         print_best_solution();
         exit(0);
     }
@@ -118,7 +115,6 @@ void branch(vector< vector<int> > jobs, int n, vector<int> order, vector<int> re
         active_nodes_count += best_positions.size();
 
         if (active_nodes_count > max_nodes_count) {
-            cout << "ULTRAPASSOU MAX NODES COUNT COM: " << active_nodes_count << endl;
             print_best_solution();
             exit(EXIT_FAILURE);
         }
