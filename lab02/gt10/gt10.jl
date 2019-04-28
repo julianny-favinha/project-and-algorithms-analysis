@@ -1,17 +1,10 @@
 using JuMP, Gurobi, Printf
 
-# open file
+# read file
 
-function read_file(args)
-	@show args
-end
-
-read_file(ARGS)
 file_name = "gt10."*ARGS[1]*".instance"
 
 f = open(file_name, "r")
-
-# read file
 
 let
 
@@ -41,7 +34,7 @@ end
 
 close(f)
 
-Edges = Array{Tuple{Int64, Int64}}(undef,m)
+Edges = Array{Tuple{Int64, Int64}}(undef, m)
 for i in 1:m
   Edges[i] = (head[i], tail[i])
 end
@@ -55,7 +48,7 @@ GT = Model(solver=GurobiSolver(TimeLimit=time_limit))
 
 @variable(GT, x[i in Edges], Bin)
 
-# object function
+# objective function
 
 @objective(GT, Max, sum(x[i] for i in Edges))
 
@@ -81,6 +74,8 @@ end
 status = solve(GT)
 obj = getobjectivevalue(GT)
 optimal_x = getvalue(x)
+
+println("The optimal objective function value is = $obj")
 
 # relatorio 
 
