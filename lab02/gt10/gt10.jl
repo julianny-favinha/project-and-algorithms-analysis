@@ -77,6 +77,8 @@ optimal_x = getvalue(x)
 
 println("The optimal objective function value is = $obj")
 
+println("The optimal_x = $optimal_x")
+
 # relatorio 
 
 println("===============================")
