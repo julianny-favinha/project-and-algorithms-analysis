@@ -52,10 +52,6 @@ SS2 = Model(solver=GurobiSolver(TimeLimit=time_limit))
 
 @variable(SS2, x[i=1:n, j=1:n], Bin)
 
-println(s)
-println(y)
-println(x)
-
 # objective function
 
 @objective(SS2, Min, sum(y[i] for i in 1:n))
@@ -102,41 +98,31 @@ for i in 1:n
 	@constraint(SS2, s[i] >= 0)
 end
 
-print(SS2)
-
 status = solve(SS2)
-obj = getobjectivevalue(SS2)
-optimal_x = getvalue(x)
-optimal_s = getvalue(s)
 
-println("The optimal objective function value is = $obj")
+# relatorio 
 
-println("The optimal_x = $optimal_x")
-println("The optimal_s = $optimal_s")
+println("===============================")
+if status == :Optimal
+	println("Solução ótima encontrada.")
+elseif status == :Unbounded
+	println("Problema é ilimitado.")
+elseif status == :Infeasible
+	println("Problema é inviável.")
+elseif status == :UserLimit
+	println("Parado por limite de tempo ou iterações.")
+elseif status == :Error
+	println("Erro do resolvedor.")
+else
+	println("Não resolvido.")
+end
+	println("Número de nós explorados: ", getnodecount(SS2::Model))
 
-# # relatorio 
-
-# println("===============================")
-# if status == :Optimal
-# 	println("Solução ótima encontrada.")
-# elseif status == :Unbounded
-# 	println("Problema é ilimitado.")
-# elseif status == :Infeasible
-# 	println("Problema é inviável.")
-# elseif status == :UserLimit
-# 	println("Parado por limite de tempo ou iterações.")
-# elseif status == :Error
-# 	println("Erro do resolvedor.")
-# else
-# 	println("Não resolvido.")
-# end
-# 	println("Número de nós explorados: ", getnodecount(SS2::Model))
-
-# D = getobjbound(SS2::Model)
-# P = getobjectivevalue(SS2::Model)
-# @printf("Melhor limitante dual: %.2f\n", D)
-# @printf("Melhor limitante primal: %.2f\n", P)
-# @printf("Gap de otimalidade: %.2f\n", (abs( D - P )/P)*100)
-# @printf("Tempo de execução: %.2f\n", getsolvetime(SS2::Model))
+D = getobjbound(SS2::Model)
+P = getobjectivevalue(SS2::Model)
+@printf("Melhor limitante dual: %.2f\n", D)
+@printf("Melhor limitante primal: %.2f\n", P)
+@printf("Gap de otimalidade: %.2f\n", (abs( D - P )/P)*100)
+@printf("Tempo de execução: %.2f\n", getsolvetime(SS2::Model))
 
 end
