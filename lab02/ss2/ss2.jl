@@ -100,6 +100,12 @@ end
 
 status = solve(SS2)
 
+obj = getobjectivevalue(SS2)
+
+open("ss2.out", "w") do f
+	write(f, "$obj")
+end
+
 # relatorio 
 
 println("===============================")

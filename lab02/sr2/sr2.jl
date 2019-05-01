@@ -19,8 +19,6 @@ i = 1
 while !eof(f)
 	line = readline(f)
 
-	println(split(line))
-
 	r, d, s = [parse(Int, x) for x in split(line)]
 	R[i] = r
 	D[i] = d
@@ -110,7 +108,9 @@ status = solve(SR2)
 
 obj = getobjectivevalue(SR2)
 
-println("The optimal objective function value is = $obj")
+open("sr2.out", "w") do f
+	write(f, "$obj")
+end
 
 # relatorio 
 
