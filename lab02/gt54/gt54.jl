@@ -38,7 +38,7 @@ Vertex = 1:n
 # model
 
 time_limit = parse(Int64, ARGS[2])
-GT = Model(solver=GurobiSolver(TimeLimit=time_limit))
+GT = Model(solver = GurobiSolver(NodefileStart = 8, TimeLimit = time_limit))
 
 # variables
 
