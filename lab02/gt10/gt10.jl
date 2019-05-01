@@ -53,7 +53,6 @@ GT = Model(solver=GurobiSolver(TimeLimit=time_limit))
 @objective(GT, Max, sum(x[i] for i in Edges))
 
 # constraints
-
 Ivertices=1:n
 
 for v in Ivertices
@@ -73,11 +72,10 @@ end
 
 status = solve(GT)
 obj = getobjectivevalue(GT)
-optimal_x = getvalue(x)
 
-println("The optimal objective function value is = $obj")
-
-println("The optimal_x = $optimal_x")
+open("gt10.out", "w") do f
+	write(f, "$obj")
+end
 
 # relatorio 
 

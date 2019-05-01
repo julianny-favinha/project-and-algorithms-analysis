@@ -84,10 +84,12 @@ for e in Edges
 end
 
 status = solve(MN)
-obj = getobjectivevalue(MN)
-optimal_x = getvalue(u)
 
-println("The optimal objective function value is = $obj")
+obj = getobjectivevalue(MN)
+
+open("mn27.out", "w") do f
+	write(f, "$obj")
+end
 
 # relatorio 
 

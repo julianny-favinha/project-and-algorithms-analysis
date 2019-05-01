@@ -97,10 +97,12 @@ for i in Vertex
  end
 
 status = solve(GT)
-obj = getobjectivevalue(GT)
-optimal_x = getvalue(x)
 
-println("The optimal objective function value is = $obj")
+obj = getobjectivevalue(GT)
+
+open("gt54.out", "w") do f
+	write(f, "$obj")
+end
 
 # relatorio 
 
