@@ -18,7 +18,6 @@ tail=zeros(Int64,(1,1))
 
 while !eof(f)
 	line = readline(f)
-
 	if lines == 1
 		n, m = [parse(Int, x) for x in split(line)]
 		head = zeros(Int64, (1, m))
@@ -53,8 +52,6 @@ MN = Model(solver=GurobiSolver(TimeLimit=time_limit))
 # objective function
 
 @objective(MN, Min, sum(u[i] for i in 1:n))
-
-println(MN)
 
 # constraints
 
