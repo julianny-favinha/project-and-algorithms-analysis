@@ -8,14 +8,14 @@ f = open(file_name, "r")
 
 let
 
-nl=1; ne=0; n=0; m=0; nt=0; t=0; s=0# => nl= número de linhas processadas; ne=número de arestas processadas; nt= numero de tuplas
+nl=1; ne=0; n=0; m=0; nt=0; t=0; s=0
 a=0; b=0; e1=0; e2=0; c=0; t1=0
 touples=(Array{Int64, 1})[]
 edges=(Array{Int64, 1})[]
 
 while !eof(f)
 	line=readline(f) 
-	if (nl==1) # => processa linha 1 contendo os valores de n e m
+	if (nl==1) 
 	   n, t, m = [parse(Int, x) for x in split(line)]
 	   ne=1
 	elseif nl==2 
@@ -28,12 +28,14 @@ while !eof(f)
 	   e1, e2, c = [parse(Int64, x) for x in split(line)]
 	   push!(edges, [e1, e2, c])
 	   nt += 1
-	end # => if
+	end 
 	nl = nl+1
- end # => while
+ end 
 close(f)
 
 Vertex = 1:n
+edges_sum = zeros(JuMP.GenericAffExpr{Float64,Variable},(1,n))
+vertex_sum = zeros(JuMP.GenericAffExpr{Float64,Variable},(1,n))
 
 # model
 
@@ -49,52 +51,28 @@ GT = Model(solver = GurobiSolver(NodefileStart = 8, TimeLimit = time_limit))
 
 @objective(GT, Min, sum(i[3]*x[i] for i in edges))
 
+for touple in touples
+   @constraint(GT, u[touple[1]] + u[touple[2]] <= 1)
+ end
 
 # constraints
 
+for j in edges
+	edges_sum[j[1]] += x[j]
+	edges_sum[j[2]] -= x[j]
+	vertex_sum[j[1]] += x[j]
+end
+
 for i in Vertex
-	flag = false
-	sum1 = 0
-	sum2 = 0
-	for j in edges
-	   if j[1] == i
-		  sum1 += x[j]
-		  flag = true
-	   end
-	   if j[2] == i
-		  sum2 += x[j]
-		  flag = true
-	   end
+	if i == s
+		@constraint(GT, edges_sum[i] == 1)
+	elseif i == t1
+		@constraint(GT, edges_sum[i] == -1)
+	else i == s
+		@constraint(GT, edges_sum[i] == 0)
 	end
-	if flag === true
-	   if i == s
-		  @constraint(GT, sum1 - sum2 == 1)
-	   elseif i == t1
-		  @constraint(GT, sum1 - sum2 == -1)
-	   else i == s
-		  @constraint(GT, sum1 - sum2 == 0)
-	   end
-	end
- end
- 
- # restrições (2): todo label é associado a exatamente um vértice
- for touple in touples
-   @constraint(GT, u[touple[1]] + u[touple[2]] >= 1)
- end
- 
- for i in Vertex
-	sum = 0
-	flag = false
-	for j in edges
-	   if j[1] == i
-		  flag = true
-		  sum += x[j]
-	   end
-	end
-	if flag == true
-	   @constraint(GT, u[i] <= sum)
-	end
- end
+	@constraint(GT, u[i] == vertex_sum[i])
+end
 
 status = solve(GT)
 
