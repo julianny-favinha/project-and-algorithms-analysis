@@ -44,19 +44,19 @@ T = maximum(D)
 
 @variable(SR2, y[i=1:n, j=1:W, t=1:T], Bin)
 
-@variable(SR2, s[j=1:W], Bin)
+@variable(SR2, k[j=1:W], Bin)
 
 # objective function
 
-@objective(SR2, Min, sum(s[j] for j in 1:W))
+@objective(SR2, Min, sum(k[j] for j in 1:W))
 
 # constraints
 
-# x_ij <= s_j
+# x_ij <= k_j
 
 for i in 1:n
 	for j in 1:W
-		@constraint(SR2, x[i, j] <= s[j])
+		@constraint(SR2, x[i, j] <= k[j])
 	end
 end
 
@@ -64,13 +64,7 @@ end
 # slot j só pode ser utilizado uma vez
 
 for j in 1:W
-	soma = 0
-
-	for i in 1:n
-		soma += x[i, j]
-	end
-
-	@constraint(SR2, soma <= 1)
+	@constraint(SR2, sum(x[i, j] for i in 1:n) <= 1)
 end
 
 # x_ij >= y_ijt
@@ -83,42 +77,11 @@ for i in 1:n
 	end
 end
 
-# (soma em j) x_ij == s_i
-# não garante sequencia de slots
+# (soma em j) x_ij == S_i
 
 for i in 1:n
-	@constraint(SR2, sum(x[i, j] for j in 1:W) == s[i])
+	@constraint(SR2, sum(x[i, j] for j in 1:W) == S[i])
 end
-
-# cada slot j só pode ser utilizado uma vez
-
-for j in 1:W
-	soma = 0
-
-	for i in 1:n
-		for t in 1:T
-			soma += y[i, j, t]
-		end
-	end
-
-	@constraint(SR2, soma <= 1)
-end
-
-# para cada item i, somar tudo tem que ser igual a s_i
-
-for i in 1:n
-	soma = 0
-
-	for j in 1:W
-		for t in 1:T
-			soma += y[i, j, t]
-		end
-	end
-
-	@constraint(SR2, soma == s[i])
-end
-
-print(SR2)
 
 # solve
 
