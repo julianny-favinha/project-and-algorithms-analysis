@@ -36,73 +36,91 @@ SR2 = Model(solver = GurobiSolver(NodefileStart = 8, TimeLimit = time_limit))
 
 # variables
 
-T = 0
+W = sum(S[i] for i in 1:n)
 
-@variable(SR2, x[i=1:n])
+T = maximum(D)
 
-@variable(SR2, k[i=1:n, j=1:n], Bin)
+@variable(SR2, x[i=1:n, j=1:W], Bin)
 
-@variable(SR2, z[i=1:n, j=1:n], Bin)
+@variable(SR2, y[i=1:n, j=1:W, t=1:T], Bin)
 
-@variable(SR2, y[i=1:n, j=1:n], Bin)
+@variable(SR2, s[j=1:W], Bin)
 
 # objective function
 
-@objective(SR2, Min, T)
+@objective(SR2, Min, sum(s[j] for j in 1:W))
 
 # constraints
 
-M = sum(R[i] for i in 1:n) + sum(D[i] for i in 1:n)
-
-# x_i <= T
+# x_ij <= s_j
 
 for i in 1:n
-	@constraint(SR2, x[i] <= T)
+	for j in 1:W
+		@constraint(SR2, x[i, j] <= s[j])
+	end
 end
 
-# x_i <= sum(s_j * j_ij)
+# (soma em i) x_ij <= 1
+# slot j só pode ser utilizado uma vez
+
+for j in 1:W
+	soma = 0
+
+	for i in 1:n
+		soma += x[i, j]
+	end
+
+	@constraint(SR2, soma <= 1)
+end
+
+# x_ij >= y_ijt
+
+for i in 1:n
+	for j in 1:W
+		for t in 1:T
+			@constraint(SR2, x[i, j] >= y[i, j, t])
+		end
+	end
+end
+
+# (soma em j) x_ij == s_i
+# não garante sequencia de slots
+
+for i in 1:n
+	@constraint(SR2, sum(x[i, j] for j in 1:W) == s[i])
+end
+
+# cada slot j só pode ser utilizado uma vez
+
+for j in 1:W
+	soma = 0
+
+	for i in 1:n
+		for t in 1:T
+			soma += y[i, j, t]
+		end
+	end
+
+	@constraint(SR2, soma <= 1)
+end
+
+# para cada item i, somar tudo tem que ser igual a s_i
 
 for i in 1:n
 	soma = 0
 
-	for j in 1:n
-		soma += S[j] * k[i, j]
+	for j in 1:W
+		for t in 1:T
+			soma += y[i, j, t]
+		end
 	end
 
-	@constraint(SR2, x[i] == soma)
+	@constraint(SR2, soma == s[i])
 end
 
-# i >= r_j - M*(1 - z_ij)
-# i < r_j + M*z_ij
+print(SR2)
 
-for i in 1:n
-	for j in 1:n
-		@constraint(SR2, i >= R[j] - M*(1 - z[i, j]))
-		@constraint(SR2, i <= R[j] + M*z[i, j] + 1)
-	end
-end
-
-# i < d_j + M*(1 - y_ij)
-# i >= d_j - M*y_ij
-
-for i in 1:n
-	for j in 1:n
-		@constraint(SR2, i <= D[j] + M*(1 - y[i, j]) + 1)
-		@constraint(SR2, i >= D[j] - M*y[i, j])
-	end
-end
-
-# k_ij >= y_ij + z_ij - 1
-
-for i in 1:n
-	for j in 1:n
-		@constraint(SR2, k[i, j] >= y[i, j] + z[i, j] - 1)
-		@constraint(SR2, k[i, j] <= y[i, j])
-		@constraint(SR2, k[i, j] <= z[i, j])
-		@constraint(SR2, k[i, j] >= 0)
-		@constraint(SR2, k[i, j] <= 1)
-	end
-end
+# solve
 
 status = solve(SR2)
 
