@@ -71,7 +71,7 @@ for i in Vertex
 	elseif i == t1
 	# (soma em j) x_tj - (soma em j) x_jt = -1 para todo j em V
 		@constraint(GT, edges_sum[i] == -1)
-	else i == s
+	else
 	# (soma em j) x_ij - (soma em j) x_ji = 0 para todo i em V - {s, t}
 		@constraint(GT, edges_sum[i] == 0)
 	end
