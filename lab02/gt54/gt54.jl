@@ -51,11 +51,12 @@ GT = Model(solver = GurobiSolver(NodefileStart = 8, TimeLimit = time_limit))
 
 @objective(GT, Min, sum(i[3]*x[i] for i in edges))
 
+# constraints
+
+# u_a + u_b <= 1 para todo (a, b) em C
 for touple in touples
    @constraint(GT, u[touple[1]] + u[touple[2]] <= 1)
  end
-
-# constraints
 
 for j in edges
 	edges_sum[j[1]] += x[j]
@@ -64,13 +65,17 @@ for j in edges
 end
 
 for i in Vertex
+	# (soma em j) x_sj - (soma em j)x_js = 1 para todo j em V
 	if i == s
 		@constraint(GT, edges_sum[i] == 1)
 	elseif i == t1
+	# (soma em j) x_tj - (soma em j) x_jt = -1 para todo j em V
 		@constraint(GT, edges_sum[i] == -1)
 	else i == s
+	# (soma em j) x_ij - (soma em j) x_ji = 0 para todo i em V - {s, t}
 		@constraint(GT, edges_sum[i] == 0)
 	end
+	# (soma em j) x_ij = u_i para todo i em V
 	@constraint(GT, u[i] == vertex_sum[i])
 end
 
