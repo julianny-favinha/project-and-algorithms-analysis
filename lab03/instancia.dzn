@@ -1,0 +1,36 @@
+L=18;                    % nÃºmero de trabalhadores disponÃ­veis
+no=3;                    % nÃºmero de ordens
+njo=[2,3,2];             % nÃºmero de jobs por ordem
+                         % os jobs de 1 a njo[1] estÃ£o na ordem 1.
+                         % os jobs de njo[i-1]+1 a njo[i] estÃ£o na ordem i > 2.
+djo=[4,2,2];             % duraÃ§Ã£o dos jobs nas ordens
+trab=[3,2,6,12,6,3,4,3]; % perfil de demanda de trabalhadores das ordens
+nprec=2;                 % nÃºmero de precedÃªncias entre jobs de ordens diferentes
+prec=[| 1, 3,            % precedencia entre jobs de ordens diferentes
+      | 3, 7 |];
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 3 
+% 
+% 2 1 2 4 23 
+% 3 2 6 12 
+% 1 1 1 0 1 
+% 2 1 3 
+% 1 2 2 0 0 
+% 
+% 3 3 5 2 9 
+% 6 3 
+% 2 1 3 1 1 
+% 1 1 1 
+% 3 2 7 
+% 2 2 4 0 0 
+% 2 3 5 0 0 
+% 
+% 2 6 7 2 7 
+% 4 3 
+% 3 1 6 0 0 
+% 3 2 7 1 0 
+% 2 1 3 
+% 
+% 10 

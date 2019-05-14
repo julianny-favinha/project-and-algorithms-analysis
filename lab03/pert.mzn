@@ -1,0 +1,1 @@
+L, njo, djo, trab, nprec e prec
