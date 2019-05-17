@@ -8,6 +8,10 @@ int: no;
 % numero de jobs para cada ordem
 array[1..no] of int: njo;
 
+int: njobs = sum(i in 1..no)(njo[i]);
+
+array[1..njobs] of int: extended_njo = [djo[i] | i in 1..no, j in 1..njo[i]];
+
 % duracao de cada ordem
 array[1..no] of int: djo;
 
@@ -23,15 +27,17 @@ int: nprec;
 % matriz de precedencias. ex: (1, 3) significa que tarefa 3 pode ser executada somente depois da 1
 array [1..2,1..nprec] of int: prec;
 
-% -------- SAIDA --------
-% tempo final para executar todas as tarefas
-% TODO: REMOVER MOCK!!!
-int: makespan = 80;
+% variavel que queremos minimizar
+array[1..njobs] of int: soma = [inicio[job] + extended_njo[job] | job in 1..njobs];
+int: makespan = max(job in 1..njobs) (soma[job]);
+
+%solve minimize makespan;
 
 % tempo de inicio de cada tarefa
 % TODO: REMOVER MOCK!!!
-array[1..ntarefas] of int: inicio = [9,8,7,6,5,4,3,0];
+array[1..njobs] of int: inicio = [0,5,4,6,9,0,6];
 
+% -------- SAIDA --------
 output ["\(makespan)\n"];
 
-output ["\(i) \(inicio[i])\n" | i in 1..ntarefas];
+output ["\(i) \(inicio[i])\n" | i in 1..njobs];
