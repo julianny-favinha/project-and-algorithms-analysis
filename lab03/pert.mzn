@@ -47,6 +47,17 @@ constraint
   forall (j in 1..nprec) (
     inicio[prec[j, 1]] + extended_djo[prec[j, 1]] <= inicio[prec[j, 2]]
   );
+  
+% precedencia entre jobs de mesma ordem
+% TODO: REMOVER MOCK!!!!
+array[1..no] of int: index = [1,3,6];
+
+constraint
+  forall (ordem in 1..no) (
+    forall (job in index[ordem]..index[ordem] + njo[ordem] - 2) (
+      inicio[job] + djo[ordem] <= inicio[job+1]
+    )
+  );
 
 % -------- FUNCAO OBJETIVO --------
 solve minimize makespan;
