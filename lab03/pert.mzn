@@ -74,6 +74,13 @@ constraint
     )
   );
 
+% As tarefas de uma mesma ordem não podem se sobrepor no tempo
+% TODO: Ainda preciso ver como isso vai entrar nessa estrutura
+% constraint
+%     forall(j in 1..no) (
+%         disjunctive([s[i,j] | i in JOB], [d[i,j] | i in JOB])
+%     );
+
 % sequencia das tarefas dentro de cada job
 constraint
   forall (job in 1..njobs) (
@@ -87,6 +94,8 @@ constraint
   forall (t in 0..soma_tempos) (
     sum(job in 1..njobs)(x[job, t]) <= L
   );
+array[1..njobs] of int: duracao = [1 | i in 1..njobs]
+constraint cumulative(inicio, duracao, trab, L);
 
 % -------- FUNCAO OBJETIVO --------
 
