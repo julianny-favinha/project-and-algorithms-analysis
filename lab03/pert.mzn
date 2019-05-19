@@ -52,6 +52,10 @@ var 0..soma_tempos: makespan;
 % quantidade de recurso utilizada por um job j num tempo t
 array[1..njobs, 0..soma_tempos] of var 0..max(trab): x;
 
+function int: sumOrderJobs(int: i) = sum(j in 1..i-1)(njo[j]);
+
+array[1..no] of int: firstJobInOrder = [1 + sumOrderJobs(i) | i in 1..no];
+
 % -------- RESTRICOES --------
 
 % o makespan deve ser maior ou igual a inicio[job] + duracao[job] para todo job
