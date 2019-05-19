@@ -34,12 +34,15 @@ array [1..2, 1..nprec] of int: prec;
 % posicao da primeira task no vetor trab para cada job
 array[1..njobs] of int: z = [1,1,5,5,5,7,7];
 
-% TODO: REMOVER MOCK!!!!
 % primeiro job de cada ordem
-array[1..no] of int: index = [1,3,6];
+array[1..no] of int: index = [1 + sumOrderJobs(i) | i in 1..no];
 
 % soma da duracao de cada job
 int: soma_tempos = sum(extended_djo);
+
+% -------- FUNCOES --------
+
+function int: sumOrderJobs(int: i) = sum(j in 1..i-1)(njo[j]);
 
 % -------- VARIAVEIS --------
 
@@ -51,10 +54,6 @@ var 0..soma_tempos: makespan;
 
 % quantidade de recurso utilizada por um job j num tempo t
 array[1..njobs, 0..soma_tempos] of var 0..max(trab): x;
-
-function int: sumOrderJobs(int: i) = sum(j in 1..i-1)(njo[j]);
-
-array[1..no] of int: firstJobInOrder = [1 + sumOrderJobs(i) | i in 1..no];
 
 % -------- RESTRICOES --------
 
