@@ -16,7 +16,7 @@ int: njobs = sum(i in 1..no)(njo[i]);
 array[1..no] of int: djo;
 
 % duracao de cada job
-array[1..njobs] of int: extended_djo = [djo[i] | i in 1..no, j in 1..njo[i]];
+array[1..njobs] of int: extended_djo = extendVector(djo);
 
 % numero de tarefas
 int: ntasks = sum(i in 1..no)(djo[i]);
@@ -30,19 +30,23 @@ int: nprec;
 % matriz de precedencias. ex: (1, 3) significa que tarefa 3 pode ser executada somente depois da 1
 array [1..2, 1..nprec] of int: prec;
 
-% TODO: REMOVER MOCK!!!!
+% vetor auxiliar para montar o vetor z
+array[1..no] of int: aux = [1 + sumOrderJobs(i,djo) | i in 1..no];
+
 % posicao da primeira task no vetor trab para cada job
-array[1..njobs] of int: z = [1,1,5,5,5,7,7];
+array[1..njobs] of int: z = extendVector(aux);
 
 % primeiro job de cada ordem
-array[1..no] of int: index = [1 + sumOrderJobs(i) | i in 1..no];
+array[1..no] of int: index = [1 + sumOrderJobs(i,njo) | i in 1..no];
 
 % soma da duracao de cada job
 int: soma_tempos = sum(extended_djo);
 
 % -------- FUNCOES --------
 
-function int: sumOrderJobs(int: i) = sum(j in 1..i-1)(njo[j]);
+function int: sumOrderJobs(int: i, array[1..no] of int: target) = sum(j in 1..i-1)(target[j]);
+
+function array[1..njobs] of int: extendVector(array[1..no] of int: target) = [target[i] | i in 1..no, j in 1..njo[i]];
 
 % -------- VARIAVEIS --------
 
