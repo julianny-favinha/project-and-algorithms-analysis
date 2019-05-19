@@ -1,4 +1,5 @@
 % -------- ENTRADA --------
+
 % numero de trabalhadores
 int: L;
 
@@ -8,8 +9,10 @@ int: no;
 % numero de jobs para cada ordem
 array[1..no] of int: njo;
 
+% soma total de jobs
 int: njobs = sum(i in 1..no)(njo[i]);
 
+% EXPLICAR O QUE EH ESSE ARRAY
 array[1..njobs] of int: extended_djo = [djo[i] | i in 1..no, j in 1..njo[i]];
 
 % duracao de cada ordem
@@ -28,18 +31,26 @@ int: nprec;
 array [1..2, 1..nprec] of int: prec;
 
 % TODO: REMOVER MOCK!!!!
+% EXPLICAR O QUE EH ESSE ARRAY
 array[1..njobs] of int: z = [1,1,5,5,5,7,7];
 
-% -------- VARIAVEIS --------
-% tempos de inicio de cada job
+% TODO: REMOVER MOCK!!!!
+% primeiro job de cada ordem
+array[1..no] of int: index = [1,3,6];
+
+% soma da duracao de cada job
 int: soma_tempos = sum(extended_djo);
+
+% -------- VARIAVEIS --------
+
+% tempo de inicio de cada job
 array[1..njobs] of var 0..soma_tempos: inicio;
 
 % variavel que queremos minimizar
 var 0..soma_tempos: makespan;
 
-% x
-array[1..njobs, 0..soma_tempos] of var 0..99: x;
+% quantidade de recurso utilizada por um job j num tempo t
+array[1..njobs, 0..soma_tempos] of var 0..max(trab): x;
 
 % -------- RESTRICOES --------
 
@@ -56,9 +67,6 @@ constraint
   );
   
 % precedencia entre jobs de mesma ordem
-% TODO: REMOVER MOCK!!!!
-array[1..no] of int: index = [1,3,6];
-
 constraint
   forall (ordem in 1..no) (
     forall (job in index[ordem]..index[ordem] + njo[ordem] - 2) (
@@ -81,9 +89,11 @@ constraint
   );
 
 % -------- FUNCAO OBJETIVO --------
+
 solve minimize makespan;
 
 % -------- SAIDA --------
+
 output ["\(makespan)\n"];
 
 output ["\(i) \(inicio[i])\n" | i in 1..njobs];
