@@ -1,4 +1,4 @@
-L=18;                    % nÃºmero de trabalhadores disponÃ­veis
+L=14;                    % nÃºmero de trabalhadores disponÃ­veis
 no=3;                    % nÃºmero de ordens
 njo=[2,3,2];             % nÃºmero de jobs por ordem
                          % os jobs de 1 a njo[1] estÃ£o na ordem 1.
