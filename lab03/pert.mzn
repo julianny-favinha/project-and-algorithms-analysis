@@ -28,7 +28,7 @@ array[1..ntasks] of int: trab;
 int: nprec;
 
 % matriz de precedencias. ex: (1, 3) significa que tarefa 3 pode ser executada somente depois da 1
-array [1..2, 1..nprec] of int: prec;
+array [1..nprec, 1..2] of int: prec;
 
 % vetor auxiliar para montar o vetor z
 array[1..no] of int: aux = [1 + sumOrderJobs(i,djo) | i in 1..no];
