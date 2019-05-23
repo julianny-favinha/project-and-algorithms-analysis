@@ -58,7 +58,7 @@ function array[1..njobs] of int: extendVector(array[1..no] of int: target) = [ta
 array[1..njobs] of var 0..soma_tempos: inicio;
 
 % variavel que queremos minimizar
-var 0..soma_tempos: makespan;
+var max(djo)..soma_tempos: makespan;
 
 % quantidade de recurso utilizada por um job j num tempo t
 array[1..njobs, 0..soma_tempos] of var 0..max(trab): x;
@@ -77,7 +77,7 @@ constraint
 constraint
   forall (j in 1..nprec) (
     inicio[prec[j, 1]] + extended_djo[prec[j, 1]] <= inicio[prec[j, 2]]
-  ); 
+  );
   
 % precedencia entre jobs de mesma ordem
 constraint
