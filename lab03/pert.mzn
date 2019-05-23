@@ -55,7 +55,7 @@ function array[1..njobs] of int: extendVector(array[1..no] of int: target) = [ta
 % -------- VARIAVEIS --------
 
 % tempo de inicio de cada job
-array[1..njobs] of var 0..soma_tempos-1: inicio;
+array[1..njobs] of var 0..soma_tempos-min(djo): inicio;
 
 % variavel que queremos minimizar
 var max(djo)..soma_tempos: makespan;
