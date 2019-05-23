@@ -1,4 +1,4 @@
-include "disjunctive.mzn";
+include "cumulative.mzn";
 
 % -------- ENTRADA --------
 
@@ -55,7 +55,7 @@ function array[1..njobs] of int: extendVector(array[1..no] of int: target) = [ta
 % -------- VARIAVEIS --------
 
 % tempo de inicio de cada job
-array[1..njobs] of var 0..soma_tempos-1: inicio;
+array[1..njobs] of var 0..soma_tempos-min(djo): inicio;
 
 % variavel que queremos minimizar
 var max(djo)..soma_tempos: makespan;
@@ -92,7 +92,6 @@ constraint
   forall (job in 1..njobs) (
     forall (indice in 1..extended_djo[job]) (
       x[job, inicio[job] + indice - 1] = trab[z[job] + indice - 1]
-      
     )
   );
 
@@ -106,7 +105,8 @@ constraint
 
 % o numero maximo de recursos deve ser respeitado
 array[1..soma_tempos] of int: duracao = [1 | i in 1..soma_tempos];
-constraint cumulative(inicioTasks, duracao, extended_trab, L);
+constraint 
+  cumulative(inicioTasks, duracao, extended_trab, L);
 
 % -------- FUNCAO OBJETIVO --------
 
