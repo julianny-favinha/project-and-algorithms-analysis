@@ -26,6 +26,8 @@ int: ntasks = sum(i in 1..no)(djo[i]);
 % numero de trabalhadores necessarios para cada tarefa
 array[1..ntasks] of int: trab;
 
+array[1..soma_tempos] of int: extended_trab = [trab[k] | i in 1..no, j in 1..njo[i], k in 1..djo[i]];
+
 % numero de precedencias
 int: nprec;
 
@@ -61,6 +63,8 @@ var 0..soma_tempos: makespan;
 % quantidade de recurso utilizada por um job j num tempo t
 array[1..njobs, 0..soma_tempos] of var 0..max(trab): x;
 
+array[1..soma_tempos] of var 0..soma_tempos: inicioTasks = [inicio[i] + j | i in 1..njobs, j in 0..extended_djo[i]-1];
+
 % -------- RESTRICOES --------
 
 % o makespan deve ser maior ou igual a inicio[job] + duracao[job] para todo job
@@ -88,6 +92,7 @@ constraint
   forall (job in 1..njobs) (
     forall (indice in 1..extended_djo[job]) (
       x[job, inicio[job] + indice - 1] = trab[z[job] + indice - 1]
+      
     )
   );
 
@@ -98,17 +103,10 @@ constraint
   );
   
 % -------- RESTRICOES GLOBAIS --------
-%output ["\(prec[3, j]) " | j in 1..2]; 
-
-% vetor prec
-%constraint
-%  forall (j in 1..2) (
-%    disjunctive([inicio[prec[i, j]] | i in 1..nprec], [extended_djo[prec[i, j]] | i in 1..nprec])
-%  );
 
 % o numero maximo de recursos deve ser respeitado
-%array[1..njobs] of int: duracao = [1 | i in 1..njobs];
-%constraint cumulative(inicio, duracao, trab, L);
+array[1..soma_tempos] of int: duracao = [1 | i in 1..soma_tempos];
+constraint cumulative(inicioTasks, duracao, extended_trab, L);
 
 % -------- FUNCAO OBJETIVO --------
 
