@@ -77,8 +77,10 @@ constraint
 % precedencia entre jobs de mesma ordem
 constraint
   forall (ordem in 1..no) (
-    forall (job in index[ordem]..index[ordem] + njo[ordem] - 2) (
-      start[job] + djo[ordem] <= start[job+1]
+    forall (job1 in index[ordem]..(index[ordem] + njo[ordem] - 1)) (
+      forall (job2 in job1+1..(index[ordem] + njo[ordem] - 1)) (
+        start[job1] + djo[ordem] <= start[job2]
+      )      
     )
   );
 
