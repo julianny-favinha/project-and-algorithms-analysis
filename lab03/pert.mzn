@@ -35,7 +35,7 @@ array[1..njobs] of int: extended_djo = extendArray(djo);
 int: ntasks = sum(i in 1..no)(djo[i]);
 
 % posicao da primeira tarefa no vetor trab para cada job
-array[1..njobs] of int: z = extendArray([1 + sumOrderJobs(i, djo) | i in 1..no]);
+array[1..njobs] of int: index_trab = extendArray([1 + sumOrderJobs(i, djo) | i in 1..no]);
 
 % primeiro job de cada ordem
 array[1..no] of int: index = [1 + sumOrderJobs(i, njo) | i in 1..no];
@@ -88,7 +88,7 @@ constraint
 constraint
   forall (job in 1..njobs) (
     forall (indice in 1..extended_djo[job]) (
-      x[job, start[job] + indice - 1] = trab[z[job] + indice - 1]
+      x[job, start[job] + indice - 1] = trab[index_trab[job] + indice - 1]
     )
   );
 
