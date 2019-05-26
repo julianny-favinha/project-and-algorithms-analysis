@@ -106,15 +106,16 @@ array[1..sum_times] of int: duration = [1 | i in 1..sum_times];
 array[1..sum_times] of int: extended_trab = [trab[k] | i in 1..no, j in 1..njo[i], k in 1..djo[i]];
 
 % tempo de inicio de cada tarefa
-array[1..sum_times] of var 0..sum_times: startTasks = [start[i] + j | i in 1..njobs, j in 0..extended_djo[i]-1];
+array[1..sum_times] of var 0..sum_times: start_tasks = [start[i] + j | i in 1..njobs, j in 0..extended_djo[i]-1];
 
 % o numero maximo de recursos deve ser respeitado
 constraint 
-  cumulative(startTasks, duration, extended_trab, L);
+  cumulative(start_tasks, duration, extended_trab, L);
 
 % ---------- FUNCAO OBJETIVO ----------
 
-solve minimize makespan;
+solve :: int_search(start, first_fail, indomain_min, complete)
+  minimize makespan;
 
 % --------------- SAIDA ---------------
 
