@@ -1,4 +1,5 @@
 include "cumulative.mzn";
+include "alldifferent.mzn";
 
 % ------------- ENTRADA -------------
 
@@ -111,6 +112,16 @@ array[1..sum_times] of var 0..sum_times: start_tasks = [start[i] + j | i in 1..n
 % o numero maximo de recursos deve ser respeitado
 constraint 
   cumulative(start_tasks, duration, extended_trab, L);
+
+% os jobs de uma mesma ordem devem começar em tempos diferentes
+constraint
+  forall (ordem in 1..no-1) (
+    alldifferent([start[job] | job in index[ordem]..index[ordem+1]-1])
+  );
+
+% tempos diferentes para os jobs da ultima ordem
+constraint
+  alldifferent([start[job] | job in index[no]..njobs]);
 
 % ---------- FUNCAO OBJETIVO ----------
 
