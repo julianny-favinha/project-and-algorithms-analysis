@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
+#include <cstdlib>
 
 using namespace std;
 
@@ -80,15 +82,15 @@ vector<NodeSource> read_file(char *name) {
 		adjacency[i] = u;
 	}
 
-	for (int i = 0; i < nodes; i++) {
-		cout << "id: " << i << " max_degree: " << adjacency[i].max_degree << endl;
-		cout << "lista de adjacentes: ";
+	// for (int i = 0; i < nodes; i++) {
+	// 	cout << "id: " << i << " max_degree: " << adjacency[i].max_degree << endl;
+	// 	cout << "lista de adjacentes: ";
 
-		for (int j = 0; j < adjacency[i].adj.size(); j++) {
-			cout << "(" << adjacency[i].adj[j].id << ", " << adjacency[i].adj[j].cost << ") ";
-		}
-		cout << endl << endl;
-	}
+	// 	for (int j = 0; j < adjacency[i].adj.size(); j++) {
+	// 		cout << "(" << adjacency[i].adj[j].id << ", " << adjacency[i].adj[j].cost << ") ";
+	// 	}
+	// 	cout << endl << endl;
+	// }
 	
 	return adjacency;
 }
