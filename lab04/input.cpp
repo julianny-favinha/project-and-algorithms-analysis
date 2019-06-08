@@ -1,31 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <cstdlib>
-
-using namespace std;
-
-struct Node {
-	int id;
-	int max_degree;
-};
-
-struct Edge {
-	int src;
-	int dest;
-	int cost;
-};
-
-struct NodeDestiny {
-	int id;
-	int cost;
-};
-
-struct NodeSource {
-	int max_degree;
-	vector<NodeDestiny> adj;
-};
+#include "input.hpp"
 
 vector<NodeSource> read_file(char *name) {
 	ifstream file; 

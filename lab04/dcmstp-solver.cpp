@@ -1,4 +1,4 @@
-#include "input.cpp"
+#include "input.hpp"
 
 using namespace std;
 
@@ -47,8 +47,68 @@ vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<int
 	return adjacency2;
 }
 
+// função que busca o subconjunto de um elemento "i"
+int buscar(int subset[], int i) {
+	if(subset[i] == -1)
+		return i;
+	return buscar(subset, subset[i]);
+}
+
+// função para unir dois subconjuntos em um único subconjunto
+void unir(int subset[], int v1, int v2){
+	int v1_set = buscar(subset, v1);
+	int v2_set = buscar(subset, v2);
+	subset[v1_set] = v2_set;
+}
+
 // kruskal ou prim
 int agm(vector<NodeSource> adjacency) {
+
+	vector<pair<pair<int, int>, int > > arvore;
+
+	map<pair<int, int>, int >::iterator it;
+	map<pair<int, int>, int > edge_map;
+
+	cout << "Teste 1" << endl;
+	// for em todos os nos pra popular o mapa
+	for (int u = 0; u < adjacency.size(); u++) {
+		for (int v = 0; v < adjacency[u].adj.size(); v++) {
+			if (!edge_map.count(make_pair(adjacency[u].adj[v].id,u))) {
+				edge_map[make_pair(u,adjacency[u].adj[v].id)]=adjacency[u].adj[v].cost; 
+			}
+		}
+	}
+
+	cout << edge_map.size() << "Teste 1" << endl;
+
+	// sort nos edges
+
+    auto cmp = [](const auto &p1, const auto &p2) {
+        return p2.second < p1.second || !(p1.second < p2.second);
+    };
+
+    set < pair<pair<int, int>, int >, decltype( cmp )> s(edge_map.begin(), edge_map.end(), cmp);
+
+	// rodo o krusal
+
+	int * subset = new int[adjacency.size()];
+	memset(subset, -1, sizeof(int) * adjacency.size());
+	for (const auto& kv : edge_map) {
+		std::cout << '{' << kv.first.first << "," << kv.first.second << '}' << '\n';
+		int v1 = buscar(subset, kv.first.first);
+		int v2 = buscar(subset, kv.first.second);
+
+		if(v1 != v2)
+		{
+			// se forem diferentes é porque NÃO forma ciclo, insere no vetor
+			arvore.push_back(kv);
+			unir(subset, v1, v2); // faz a união
+		}
+
+	}
+
+	cout << arvore.size() << "Teste maluco" << endl;
+
 	// supondo uma solução que envolve as arestas (0,1) (1,2) (1,3)
 	// (10 + 1*2 + 20 + 1*2 + 80 + 1*2)
 	return 156; 
