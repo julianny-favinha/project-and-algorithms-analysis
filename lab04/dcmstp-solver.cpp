@@ -1,12 +1,26 @@
 #include "input.hpp"
 #include "agm.hpp"
+#include "output.hpp"
 
 int iterations = 1;
 
 int best_dual = INT_MAX;
 int best_primal = INT_MAX;
-
 vector<NodeSource> best_agm;
+
+// tempo de inicio de execucao
+clock_t start;
+
+// tempo maximo de execucao
+int max_time;
+
+// verifica se tempo expirou
+bool time_expired() {
+    clock_t finish = clock();
+    int total_time_execution = (int) ((finish - start) / (float)CLOCKS_PER_SEC);
+
+    return total_time_execution > max_time;
+}
 
 // retorna true quando ocorreram todas as iterações OU se o limitante dual é igual ao primal
 bool stop_subgradient() {
@@ -25,7 +39,9 @@ int calculate_cost(vector<NodeSource> adjacency) {
 
 	for (int i = 0; i < nodes; i++) {
 		for (int j = 0; j < adjacency[i].adj.size(); j++) {
-			cost += adjacency[i].adj[j].cost;
+			if (i < adjacency[i].adj[j].id) {
+				cost += adjacency[i].adj[j].cost;
+			}
 		}
 	}
 
@@ -43,6 +59,29 @@ vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<int
 	}
 
 	return adjacency2;
+}
+
+// verifica se a lista de adjacencias é uma solução viavel
+bool is_solution(vector<NodeSource> adjacency) {
+	for (int i = 0; i < adjacency.size(); i++) {
+		if (adjacency[i].adj.size() > adjacency[i].max_degree) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+vector<NodeSource> remove_lambdas(vector<NodeSource> adjacency, vector<int> lambdas) {
+	vector<NodeSource> result = adjacency;
+
+	for (int i = 0; i < result.size(); i++) {
+		for (int j = 0; j < result[i].adj.size(); j++) {
+			result[i].adj[j].cost = result[i].adj[j].cost - lambdas[i] - lambdas[result[i].adj[j].id];
+		}
+	}
+
+	return result;
 }
 
 // inicializa lambda
@@ -64,50 +103,55 @@ void update_lambdas(vector<int> *lambdas) {
 	}
 }
 
-// grava no arquivo file_name.out a lista de arestas
-void save_output(char *file_name) {
-	string buf(file_name);
-	buf.append(".out");
-
-	ofstream file;
-	file.open(buf);
-
-	// TODO salvar arestas
-	// vertices rotulados de 1 a n
-	// ordem crescente
-	// aresta 3 1 deve ser salva como 1 3
-
-	file.close();
-}
-
 // relaxação lagrangiana / algoritmo do subgradiente
 void lagrangean_relaxation(vector<NodeSource> adjacency) {
-	int nodes = adjacency.size();
-	
-	vector<int> lambdas = first_lambda(nodes);
+	vector<int> lambdas = first_lambda(adjacency.size());
 
 	while (stop_subgradient() == false) {
-		vector<NodeSource> adjacency2 = increment_edges_cost(adjacency, lambdas);
+		if (time_expired()) {
+        	break;
+    	}
+
+		cout << "GRAFO ORIGINAL" << endl;
+		print_graph(adjacency);
+
+		vector<NodeSource> adjacency_with_lambdas = increment_edges_cost(adjacency, lambdas);
+
+		cout << "GRAFO COM LAMBDAS" << endl;
+		print_graph(adjacency_with_lambdas);
 		
-		// calcula limitante dual. a agm retornada pode ser uma solucao viavel
+		// calcula arvore geradora minima (limitante dual)
+		vector<NodeSource> dual_agm_with_lambdas = agm(adjacency_with_lambdas);
 
-		vector<NodeSource> bla = agm(adjacency);
-		int dual_agm = 158;
+		if (time_expired()) {
+        	break;
+    	}
 
-		if (dual_agm < best_dual) {
-			best_dual = dual_agm;
+		cout << "GRAFO AGM" << endl;
+		print_graph(dual_agm_with_lambdas);
+
+		int cost_dual = calculate_cost(dual_agm_with_lambdas);
+
+		cout << "CUSTO AGM" << endl;
+		cout << cost_dual << endl;
+
+		if (cost_dual < best_dual) {
+			best_dual = cost_dual;
 		}
 
-		// TODO verifica se é uma solucao viavel
-		// TODO se sim, é um limitante primal
+		if (is_solution(dual_agm_with_lambdas)) {
+			cout << "É PRIMAL TAMBÉM" << endl;
+			// se o dual é uma solução, então é um limitante primal também
+			vector<NodeSource> primal_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
+			int cost_primal = calculate_cost(primal_agm);
 
-		int primal_agm = dual_agm;
-
-		// TODO se não, rodar alguma heuristica lagrangiana pra transformar em viavel
-
-		if (primal_agm < best_primal) {
-			best_primal = primal_agm;
-			// TODO atualizar best_agm
+			if (cost_primal < best_primal) {
+				best_primal = cost_primal;
+				best_agm = primal_agm;
+			}
+		} else {
+			cout << "NÃO É PRIMAL" << endl;
+			// TODO se não, rodar alguma heuristica lagrangiana pra transformar em viavel
 		}
 
 		update_lambdas(&lambdas);
@@ -115,21 +159,24 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 }
 
 int main(int argc, char *argv[]) {
+	start = clock();
+
 	char *file_name = argv[1];
 	int time = atoi(argv[2]);
 	char *method = argv[3];
 
 	vector<NodeSource> adjacency = read_file(file_name);
+	max_time = time;
 
 	if (string(method) == "l") {
 		lagrangean_relaxation(adjacency);
-		save_output(file_name);
 		cout << file_name << "," << best_dual << "," << best_primal << endl;
 	} else {
 		cout << "IMPLEMENTAR META-HEURÍSTICA" << endl;
-		save_output(file_name);
 		cout << file_name << "," << best_primal << endl;
 	}
-	
+
+	save_output(file_name, best_agm);
+
 	return 0;
 }

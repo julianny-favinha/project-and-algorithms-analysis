@@ -33,8 +33,6 @@ struct NodeSource {
 	vector<NodeDestiny> adj;
 };
 
-extern vector<Edge> edges_list;
-
 vector<NodeSource> read_file(char *name);
 void print_graph(vector<NodeSource> adjacency);
 vector<int> calculate_degrees(vector<NodeSource> adjacency);
