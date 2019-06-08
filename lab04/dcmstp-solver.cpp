@@ -1,4 +1,5 @@
 #include "input.hpp"
+#include "agm.hpp"
 
 int iterations = 1;
 
@@ -42,69 +43,6 @@ vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<int
 	}
 
 	return adjacency2;
-}
-
-// busca o subconjunto de um elemento i
-int buscar(int subset[], int i) {
-	if (subset[i] == -1) {
-		return i;
-	}
-
-	return buscar(subset, subset[i]);
-}
-
-// une dois subconjuntos em um único subconjunto
-void unir(int subset[], int v1, int v2){
-	int v1_set = buscar(subset, v1);
-	int v2_set = buscar(subset, v2);
-	subset[v1_set] = v2_set;
-}
-
-// arvore geradora minima
-int agm(vector<NodeSource> adjacency) {
-
-	vector<pair<pair<int, int>, int > > arvore;
-
-	map<pair<int, int>, int >::iterator it;
-	map<pair<int, int>, int > edge_map;
-
-	cout << "Teste 1" << endl;
-	// for em todos os nos pra popular o mapa
-	for (int u = 0; u < adjacency.size(); u++) {
-		for (int v = 0; v < adjacency[u].adj.size(); v++) {
-			if (!edge_map.count(make_pair(adjacency[u].adj[v].id,u))) {
-				edge_map[make_pair(u,adjacency[u].adj[v].id)]=adjacency[u].adj[v].cost; 
-			}
-		}
-	}
-
-	cout << edge_map.size() << "Teste 1" << endl;
-
-	// ordena os edges crescentemente
-
-    auto cmp = [](const auto &p1, const auto &p2) {
-        return p2.second < p1.second || !(p1.second < p2.second);
-    };
-
-    set < pair<pair<int, int>, int >, decltype( cmp )> s(edge_map.begin(), edge_map.end(), cmp);
-
-	int * subset = new int[adjacency.size()];
-	memset(subset, -1, sizeof(int) * adjacency.size());
-	for (const auto& kv : edge_map) {
-		cout << '{' << kv.first.first << "," << kv.first.second << '}' << '\n';
-		int v1 = buscar(subset, kv.first.first);
-		int v2 = buscar(subset, kv.first.second);
-
-		// se forem diferentes é porque NÃO forma ciclo, insere no vetor
-		if (v1 != v2) {
-			arvore.push_back(kv);
-			unir(subset, v1, v2);
-		}
-	}
-
-	cout << arvore.size() << "Teste maluco" << endl;
-
-	return 156; 
 }
 
 // inicializa lambda
@@ -152,7 +90,9 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 		vector<NodeSource> adjacency2 = increment_edges_cost(adjacency, lambdas);
 		
 		// calcula limitante dual. a agm retornada pode ser uma solucao viavel
-		int dual_agm = agm(adjacency2);
+
+		vector<NodeSource> bla = agm(adjacency);
+		int dual_agm = 158;
 
 		if (dual_agm < best_dual) {
 			best_dual = dual_agm;
