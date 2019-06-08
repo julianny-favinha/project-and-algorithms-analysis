@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <map>
 #include <set>
+#include <climits>
 
 using namespace std;
 
@@ -34,7 +35,8 @@ struct NodeSource {
 
 extern vector<Edge> edges_list;
 
-// 
 vector<NodeSource> read_file(char *name);
+void print_graph(vector<NodeSource> adjacency);
+vector<int> calculate_degrees(vector<NodeSource> adjacency);
 
 #endif /* input_hpp */
