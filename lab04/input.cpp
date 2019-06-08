@@ -1,5 +1,31 @@
 #include "input.hpp"
 
+// retorna um vetor de nodes posições com o grau de cada vértice
+vector<int> calculate_degrees(vector<NodeSource> adjacency) {
+	vector<int> degrees(adjacency.size());
+
+	for (int v = 0; v < degrees.size(); v++) {
+		degrees[v] = adjacency[v].max_degree;
+	}
+
+	return degrees;
+}
+
+// imprime grafo
+void print_graph(vector<NodeSource> adjacency) {
+	int nodes = adjacency.size();
+
+	for (int i = 0; i < nodes; i++) {
+		cout << "id: " << i << " max_degree: " << adjacency[i].max_degree << endl;
+		cout << "adjacency list: ";
+
+		for (int j = 0; j < adjacency[i].adj.size(); j++) {
+			cout << "(" << adjacency[i].adj[j].id << ", " << adjacency[i].adj[j].cost << ") ";
+		}
+		cout << endl << endl;
+	}
+}
+
 vector<NodeSource> read_file(char *name) {
 	ifstream file; 
 	file.open(name);
@@ -55,15 +81,7 @@ vector<NodeSource> read_file(char *name) {
 		adjacency[i] = u;
 	}
 
-	// for (int i = 0; i < nodes; i++) {
-	// 	cout << "id: " << i << " max_degree: " << adjacency[i].max_degree << endl;
-	// 	cout << "lista de adjacentes: ";
-
-	// 	for (int j = 0; j < adjacency[i].adj.size(); j++) {
-	// 		cout << "(" << adjacency[i].adj[j].id << ", " << adjacency[i].adj[j].cost << ") ";
-	// 	}
-	// 	cout << endl << endl;
-	// }
+	// print_graph(adjacency);
 	
 	return adjacency;
 }
