@@ -60,6 +60,7 @@ vector<NodeSource> read_file(char *name) {
 
 	for (int i = 0; i < nodes; i++) {
 		NodeSource u;
+		u.id = i
 		u.max_degree = nodes_list[i].max_degree;
 
 		for (int j = 0; j < edges; j++) {

@@ -62,14 +62,17 @@ vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<int
 }
 
 // verifica se a lista de adjacencias é uma solução viavel
-bool is_solution(vector<NodeSource> adjacency) {
+pair<vector<NodeSource>, bool> is_solution(vector<NodeSource> adjacency) {
+	vector<NodeSource> nodes;
+	bool solution = true;
 	for (int i = 0; i < adjacency.size(); i++) {
 		if (adjacency[i].adj.size() > adjacency[i].max_degree) {
-			return false;
+			nodes.push_back(adjacency[i]);
+			solution = false;
 		}
 	}
 
-	return true;
+	return make_pair(nodes,solution);
 }
 
 vector<NodeSource> remove_lambdas(vector<NodeSource> adjacency, vector<int> lambdas) {
@@ -139,7 +142,9 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 			best_dual = cost_dual;
 		}
 
-		if (is_solution(dual_agm_with_lambdas)) {
+		pair<vector<NodeSource>, bool> solution = is_solution(dual_agm_with_lambdas);
+
+		if (solution.second) {
 			cout << "É PRIMAL TAMBÉM" << endl;
 			// se o dual é uma solução, então é um limitante primal também
 			vector<NodeSource> primal_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
@@ -151,11 +156,23 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 			}
 		} else {
 			cout << "NÃO É PRIMAL" << endl;
+			// lagrangean_heuristic(solution.first, adjacency) 
 			// TODO se não, rodar alguma heuristica lagrangiana pra transformar em viavel
 		}
 
 		update_lambdas(&lambdas);
 	}
+}
+
+vector<NodeSource> lagrangean_heuristic(vector<NodeSource> solution, vector<NodeSource> base) {
+	for (const auto& no : solution) {
+		for (const auto& aresta : no.adj) {
+//         - retiro a aresta
+//         - tento ligar esse nó com um outro nó ligado ao nó original (ordenar por menor custo), verificando sempre a viabilidade
+//     - com as novas possibilidades, escolhe a menor
+		}
+	}
+
 }
 
 int main(int argc, char *argv[]) {
