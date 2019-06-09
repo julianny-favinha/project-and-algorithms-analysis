@@ -66,6 +66,7 @@ vector<NodeSource> agm(vector<NodeSource> adjacency) {
 
     for (const auto& no : arvore) {
         if (arvoreMinima[no.first.first].max_degree == -1) {
+            arvoreMinima[no.first.first].id = adjacency[no.first.first].id
             arvoreMinima[no.first.first].max_degree = adjacency[no.first.first].max_degree;
             NodeDestiny v;
             v.id = no.first.second;
@@ -79,6 +80,7 @@ vector<NodeSource> agm(vector<NodeSource> adjacency) {
         }
         
         if (arvoreMinima[no.first.second].max_degree == -1) {
+            arvoreMinima[no.first.second].id = adjacency[no.first.second].id
             arvoreMinima[no.first.second].max_degree = adjacency[no.first.second].max_degree;
             NodeDestiny v;
             v.id = no.first.first;
