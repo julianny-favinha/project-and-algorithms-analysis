@@ -29,7 +29,6 @@ struct NodeDestiny {
 };
 
 struct NodeSource {
-	int id;
 	int max_degree;
 	vector<NodeDestiny> adj;
 };
