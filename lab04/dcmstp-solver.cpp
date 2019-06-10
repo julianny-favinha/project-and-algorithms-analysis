@@ -109,6 +109,7 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 
 	while (stop_subgradient() == false) {
 		if (time_expired()) {
+			cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
 
@@ -124,6 +125,7 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 		vector<NodeSource> dual_agm_with_lambdas = agm(adjacency_with_lambdas);
 
 		if (time_expired()) {
+			cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
 

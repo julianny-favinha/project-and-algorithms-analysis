@@ -1,7 +1,11 @@
 #include "output.hpp"
 
-bool sort_by_sec(const pair<int,int> &a, const pair<int,int> &b) {
-    return a.first <= b.first && a.second < b.second; 
+bool sort_by_sec(const pair<int,int> &rhs, const pair<int,int> &lhs) {
+	if (rhs.first == lhs.first) {
+		return rhs.second < lhs.second;
+	}
+	
+    return rhs.first < lhs.first;
 } 
 
 // grava no arquivo file_name.out a lista de arestas em ordem crescente
@@ -15,8 +19,7 @@ void save_output(char *file_name, vector<NodeSource> agm) {
 	for (int i = 0; i < agm.size(); i++) {
 		for (int j = 0; j < agm[i].adj.size(); j++) {
 			if (i < agm[i].adj[j].id) {
-				pair<int, int> edge (i+1, agm[i].adj[j].id+1);
-				edges.push_back(edge);
+				edges.push_back(make_pair(i+1, agm[i].adj[j].id+1));
 			}
 		}
 	}
@@ -24,7 +27,6 @@ void save_output(char *file_name, vector<NodeSource> agm) {
 	buf.append(".out");
 	file.open(buf);
 
-	sort(edges.begin(), edges.end());
 	sort(edges.begin(), edges.end(), sort_by_sec);
 
 	for (int i = 0; i < edges.size(); i++) {
