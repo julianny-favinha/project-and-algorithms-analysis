@@ -1,5 +1,33 @@
 #include "agm.hpp"
 
+vector<NodeSource> transform(vector<NodeSource> adjacency, vector< pair< pair<int, int>, int > > agm_edges, int nodes) {
+    vector<NodeSource> agm_adjacency(nodes);
+
+    for (int i = 0; i < nodes; i++) {
+        NodeSource u;
+        u.max_degree = adjacency[i].max_degree;
+        agm_adjacency[i] = u;
+    }
+
+    for (int i = 0; i < agm_edges.size(); i++) {
+        if (agm_edges[i].first.first < agm_edges[i].first.second) {
+            NodeDestiny v1;
+            v1.id = agm_edges[i].first.second;
+            v1.cost = agm_edges[i].second;
+
+            agm_adjacency[agm_edges[i].first.first].adj.push_back(v1);
+
+            NodeDestiny v2;
+            v2.id = agm_edges[i].first.first;
+            v2.cost = agm_edges[i].second;
+
+            agm_adjacency[agm_edges[i].first.second].adj.push_back(v2);
+        }
+    }
+
+    return agm_adjacency;
+}
+
 // ordena custo crescentemente
 bool sort_cost_ascending(const pair< pair<int, int>, int > &rhs, const pair< pair<int, int>, int > &lhs) {
     return rhs.second < lhs.second;
@@ -116,29 +144,7 @@ vector<NodeSource> agm_with_degree_restriction(vector<NodeSource> adjacency) {
         k++;
     }
 
-    vector<NodeSource> agm_adjacency(nodes);
-
-    for (int i = 0; i < nodes; i++) {
-        NodeSource u;
-        u.max_degree = adjacency[i].max_degree;
-        agm_adjacency[i] = u;
-    }
-
-    for (int i = 0; i < agm_edges.size(); i++) {
-        if (agm_edges[i].first.first < agm_edges[i].first.second) {
-            NodeDestiny v1;
-            v1.id = agm_edges[i].first.second;
-            v1.cost = agm_edges[i].second;
-
-            agm_adjacency[agm_edges[i].first.first].adj.push_back(v1);
-
-            NodeDestiny v2;
-            v2.id = agm_edges[i].first.first;
-            v2.cost = agm_edges[i].second;
-
-            agm_adjacency[agm_edges[i].first.second].adj.push_back(v2);
-        }
-    }
+    vector<NodeSource> agm_adjacency = transform(adjacency, agm_edges, nodes);
 
     // print_graph(agm_adjacency);
 
