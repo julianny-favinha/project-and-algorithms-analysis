@@ -64,7 +64,7 @@ vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<flo
 // verifica se a lista de adjacencias é uma solução viavel
 bool is_solution(vector<NodeSource> adjacency) {
 	for (int i = 0; i < adjacency.size(); i++) {
-		if (adjacency[i].adj.size() > adjacency[i].max_degree) {
+		if (adjacency[i].adj.size() < 1 || adjacency[i].adj.size() > adjacency[i].max_degree) {
 			return false;
 		}
 	}
@@ -103,7 +103,7 @@ vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, flo
 	vector<float> new_lambdas(nodes);
 
 	float alpha = 2.0;
-	float beta = 3.0;
+	float beta = 0.03;
 
 	vector<int> s(nodes);
 	int s_norm = 0;
@@ -115,29 +115,14 @@ vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, flo
 		s_norm += s[i] * s[i];
 	}
 
-	// cout << "s: ";
-	// for (int i = 0; i < s.size(); i++) {
-	// 	cout << s[i] << " ";
-	// }
-	// cout << endl;
-
-	// cout << "s_norm: " << s_norm << endl;
-
 	// calcula t
 	float t = alpha*((1 + beta) * cost_primal - cost_dual) / s_norm;
 
-	// cout << "t: " << t << endl;
 
 	// atualiza lambdas
 	for (int i = 0; i < nodes; i++) {
 		new_lambdas[i] = max(0.0f, lambdas[i] + t * s[i]);
 	}
-
-	cout << "NEW LAMBDAS: ";
-	for (int i = 0; i < new_lambdas.size(); i++) {
-		cout << new_lambdas[i] << " ";
-	}
-	cout << endl << endl;
 
 	return new_lambdas;
 }
@@ -162,6 +147,12 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 		
 		// calcula arvore geradora minima (limitante dual)
 		vector<NodeSource> dual_agm_with_lambdas = agm(adjacency_with_lambdas);
+
+		if (time_expired()) {
+			cout << "TEMPO EXPIRADO" << endl;
+        	break;
+    	}
+
 		int cost_dual_with_lambdas = calculate_cost(dual_agm_with_lambdas);
 
 		cout << "GRAFO DUAL" << endl;
@@ -179,7 +170,7 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 		int cost_primal = best_primal;
 
 		if (is_solution(dual_agm)) {
-			cout << "É PRIMAL TAMBÉM" << endl;
+			// cout << "É PRIMAL TAMBÉM" << endl;
 			// se o dual é uma solução, então é um limitante primal também
 			vector<NodeSource> primal_agm = dual_agm;
 			cost_primal = calculate_cost(primal_agm);
@@ -190,6 +181,12 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 			}
 		} else {
 			vector<NodeSource> primal_agm_with_lambdas = agm_with_degree_restriction(adjacency_with_lambdas);
+
+			if (time_expired()) {
+				cout << "TEMPO EXPIRADO" << endl;
+	        	break;
+    		}
+
 			vector<NodeSource> primal_agm = remove_lambdas(primal_agm_with_lambdas, lambdas);
 			cost_primal = calculate_cost(primal_agm);
 
@@ -204,12 +201,14 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 			}
 		}
 
-		vector<float> new_lambdas = update_lambdas(lambdas, dual_agm_with_lambdas, cost_dual_with_lambdas, cost_primal);
-		lambdas = new_lambdas;
+		if (time_expired()) {
+			cout << "TEMPO EXPIRADO" << endl;
+        	break;
+    	}
 
-		cout << "MELHORES CUSTOS ENCONTRADOS ATE AGORA" << endl;
-		cout << "best_dual: " << best_dual << " best_primal: " << best_primal << endl;
-		cout << "------------------------------------------------------------------------------------" << endl;
+		vector<float> new_lambdas = update_lambdas(lambdas, dual_agm_with_lambdas, cost_dual_with_lambdas, cost_primal);
+
+		lambdas = new_lambdas;
 	}
 }
 
