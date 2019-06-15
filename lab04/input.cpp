@@ -40,7 +40,8 @@ vector<NodeSource> read_file(char *name) {
 
 	for (int i = 0; i < edges; i++) {
 		Edge edge;
-		int u, v, cost;
+		int u, v;
+		float cost;
 		file >> u >> v >> cost;
 		edge.src = u-1;
 		edge.dest = v-1;

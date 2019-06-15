@@ -2,10 +2,10 @@
 #include "agm.hpp"
 #include "output.hpp"
 
-int iterations = 1;
+int iterations = 10;
 
-int best_dual = INT_MIN;
-int best_primal = INT_MAX;
+float best_dual = float(INT_MIN);
+float best_primal = float(INT_MAX);
 vector<NodeSource> best_agm;
 
 // tempo de inicio de execucao
@@ -24,7 +24,7 @@ bool time_expired() {
 
 // retorna true quando ocorreram todas as iterações OU se o limitante dual é igual ao primal
 bool stop_subgradient() {
-	if (iterations == 0 || (best_dual == best_primal && best_dual != INT_MAX)) {
+	if (iterations == 0 || (best_dual == best_primal && best_primal != float(INT_MAX))) {
 		return true;
 	}
 
@@ -48,8 +48,8 @@ int calculate_cost(vector<NodeSource> adjacency) {
 	return cost;
 }
 
-// incrementa o custo das arestas (i,j): c_(i,j) = c_(i,j) + lambda(i) + lambda(j)
-vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<int> lambdas) {
+// incrementa o custo das arestas (i,j): c_(i,j) += lambda(i) + lambda(j)
+vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<float> lambdas) {
 	vector<NodeSource> adjacency2 = adjacency;
 
 	for (int u = 0; u < adjacency2.size(); u++) {
@@ -72,7 +72,8 @@ bool is_solution(vector<NodeSource> adjacency) {
 	return true;
 }
 
-vector<NodeSource> remove_lambdas(vector<NodeSource> adjacency, vector<int> lambdas) {
+// remove os lambdas somados no custo de cada aresta
+vector<NodeSource> remove_lambdas(vector<NodeSource> adjacency, vector<float> lambdas) {
 	vector<NodeSource> result = adjacency;
 
 	for (int i = 0; i < result.size(); i++) {
@@ -84,28 +85,66 @@ vector<NodeSource> remove_lambdas(vector<NodeSource> adjacency, vector<int> lamb
 	return result;
 }
 
-// inicializa lambda
-vector<int> first_lambda(int n) {
-	vector<int> lambdas(n);
+// inicializa lambdas
+vector<float> first_lambda(int n) {
+	vector<float> lambdas(n);
 
 	for (int i = 0; i < lambdas.size(); i++) {
-		lambdas[i] = 1;
+		lambdas[i] = 1.0;
 	}
 
 	return lambdas;
 }
 
-// atualiza lambda com o passo u_k
-// TODO qual o tamanho do passo?
-void update_lambdas(vector<int> *lambdas) {
-	for (int i = 0; i < lambdas->size(); i++) {
-		(*lambdas)[i] += 1;
+// atualiza lambdas
+vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, float cost_dual, float cost_primal) {
+	int nodes = lambdas.size();
+
+	vector<float> new_lambdas(nodes);
+
+	float alpha = 2.0;
+	float beta = 3.0;
+
+	vector<int> s(nodes);
+	int s_norm = 0;
+
+	// calcula vetor s
+	// calcula norma (ou modulo)
+	for (int i = 0; i < nodes; i++) {
+		s[i] = dual[i].adj.size() - dual[i].max_degree;
+		s_norm += s[i] * s[i];
 	}
+
+	// cout << "s: ";
+	// for (int i = 0; i < s.size(); i++) {
+	// 	cout << s[i] << " ";
+	// }
+	// cout << endl;
+
+	// cout << "s_norm: " << s_norm << endl;
+
+	// calcula t
+	float t = alpha*((1 + beta) * cost_primal - cost_dual) / s_norm;
+
+	// cout << "t: " << t << endl;
+
+	// atualiza lambdas
+	for (int i = 0; i < nodes; i++) {
+		new_lambdas[i] = max(0.0f, lambdas[i] + t * s[i]);
+	}
+
+	cout << "NEW LAMBDAS: ";
+	for (int i = 0; i < new_lambdas.size(); i++) {
+		cout << new_lambdas[i] << " ";
+	}
+	cout << endl << endl;
+
+	return new_lambdas;
 }
 
 // relaxação lagrangiana / algoritmo do subgradiente
 void lagrangean_relaxation(vector<NodeSource> adjacency) {
-	vector<int> lambdas = first_lambda(adjacency.size());
+	vector<float> lambdas = first_lambda(adjacency.size());
 
 	while (stop_subgradient() == false) {
 		if (time_expired()) {
@@ -113,50 +152,51 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
         	break;
     	}
 
-		cout << "GRAFO ORIGINAL" << endl;
-		print_graph(adjacency);
+		// cout << "GRAFO ORIGINAL" << endl;
+		// print_graph(adjacency);
 
 		vector<NodeSource> adjacency_with_lambdas = increment_edges_cost(adjacency, lambdas);
 
-		cout << "GRAFO COM LAMBDAS" << endl;
-		print_graph(adjacency_with_lambdas);
+		// cout << "GRAFO COM LAMBDAS" << endl;
+		// print_graph(adjacency_with_lambdas);
 		
 		// calcula arvore geradora minima (limitante dual)
 		vector<NodeSource> dual_agm_with_lambdas = agm(adjacency_with_lambdas);
+		int cost_dual_with_lambdas = calculate_cost(dual_agm_with_lambdas);
 
-		if (time_expired()) {
-			cout << "TEMPO EXPIRADO" << endl;
-        	break;
-    	}
-
-		cout << "GRAFO AGM" << endl;
+		cout << "GRAFO DUAL" << endl;
 		print_graph(dual_agm_with_lambdas);
 
 		vector<NodeSource> dual_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
 		int cost_dual = calculate_cost(dual_agm);
 
-		cout << "CUSTO AGM" << endl;
-		cout << cost_dual << endl;
+		cout << "CUSTO DUAL: " << cost_dual << endl << endl;
 
 		if (cost_dual > best_dual) {
 			best_dual = cost_dual;
 		}
 
+		int cost_primal = best_primal;
+
 		if (is_solution(dual_agm)) {
 			cout << "É PRIMAL TAMBÉM" << endl;
 			// se o dual é uma solução, então é um limitante primal também
 			vector<NodeSource> primal_agm = dual_agm;
-			int cost_primal = calculate_cost(primal_agm);
+			cost_primal = calculate_cost(primal_agm);
 
 			if (cost_primal < best_primal) {
 				best_primal = cost_primal;
 				best_agm = primal_agm;
 			}
 		} else {
-			cout << "NÃO É PRIMAL" << endl;
 			vector<NodeSource> primal_agm_with_lambdas = agm_with_degree_restriction(adjacency_with_lambdas);
 			vector<NodeSource> primal_agm = remove_lambdas(primal_agm_with_lambdas, lambdas);
-			int cost_primal = calculate_cost(primal_agm);
+			cost_primal = calculate_cost(primal_agm);
+
+			cout << "GRAFO PRIMAL" << endl;
+			print_graph(primal_agm);
+
+			cout << "CUSTO PRIMAL: " << cost_primal << endl << endl;
 
 			if (cost_primal < best_primal) {
 				best_primal = cost_primal;
@@ -164,7 +204,12 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 			}
 		}
 
-		update_lambdas(&lambdas);
+		vector<float> new_lambdas = update_lambdas(lambdas, dual_agm_with_lambdas, cost_dual_with_lambdas, cost_primal);
+		lambdas = new_lambdas;
+
+		cout << "MELHORES CUSTOS ENCONTRADOS ATE AGORA" << endl;
+		cout << "best_dual: " << best_dual << " best_primal: " << best_primal << endl;
+		cout << "------------------------------------------------------------------------------------" << endl;
 	}
 }
 
