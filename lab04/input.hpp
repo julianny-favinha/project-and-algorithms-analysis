@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include <climits>
+#include <algorithm>
 
 using namespace std;
 
@@ -20,12 +21,12 @@ struct Node {
 struct Edge {
 	int src;
 	int dest;
-	int cost;
+	float cost;
 };
 
 struct NodeDestiny {
 	int id;
-	int cost;
+	float cost;
 };
 
 struct NodeSource {
