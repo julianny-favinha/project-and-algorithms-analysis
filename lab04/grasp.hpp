@@ -5,6 +5,11 @@
 
 using namespace std;
 
-vector<NodeSource> agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval, int times);
+struct Agm {
+	int cost;
+	vector<NodeSource> adjacency;
+};
+
+Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval);
 
 #endif /* grasp_hpp */
