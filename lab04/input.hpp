@@ -35,7 +35,13 @@ struct NodeSource {
 	vector<NodeDestiny> adj;
 };
 
-vector<NodeSource> read_file(char *name);
+struct Graph {
+	int V;
+	int E;
+	vector<NodeSource> adjacency;
+};
+
+Graph read_file(char *name);
 void print_graph(vector<NodeSource> adjacency);
 vector<int> calculate_degrees(vector<NodeSource> adjacency);
 

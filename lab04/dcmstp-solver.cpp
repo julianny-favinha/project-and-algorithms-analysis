@@ -113,8 +113,9 @@ vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, flo
 }
 
 // relaxação lagrangiana / algoritmo do subgradiente
-void lagrangean_relaxation(vector<NodeSource> adjacency) {
-	vector<float> lambdas = first_lambda(adjacency.size());
+void lagrangean_relaxation(Graph g) {
+	vector<NodeSource> adjacency = g.adjacency;
+	vector<float> lambdas = first_lambda(g.V);
 
 	while (stop_subgradient() == false) {
 		if (time_expired()) {
@@ -158,7 +159,7 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 				best_agm = primal_agm;
 			}
 		} else {
-			vector<NodeSource> primal_agm_with_lambdas = agm_with_degree_restriction(adjacency_with_lambdas);
+			vector<NodeSource> primal_agm_with_lambdas = agm_with_degree_restriction(g.V, g.E, adjacency_with_lambdas);
 
 			if (time_expired()) {
 				cout << "TEMPO EXPIRADO" << endl;
@@ -192,15 +193,15 @@ int main(int argc, char *argv[]) {
 	int time = atoi(argv[2]);
 	char *method = argv[3];
 
-	vector<NodeSource> adjacency = read_file(file_name);
+	Graph g = read_file(file_name);
 	max_time = time;
 
 	if (string(method) == "l") {
-		lagrangean_relaxation(adjacency);
-		cout << fixed << file_name << "," << setprecision(4) << best_dual << "," << setprecision(4) << best_primal << endl;
+		lagrangean_relaxation(g);
+		printf("%s,%.4f,%.4f\n", file_name, best_dual, best_primal);
 	} else {
 		cout << "IMPLEMENTAR META-HEURÍSTICA" << endl;
-		cout << fixed << file_name << "," << setprecision(4) << best_primal << endl;
+		printf("%s,%.4f\n", file_name, best_primal);
 	}
 
 	// clock_t finish = clock();

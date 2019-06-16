@@ -112,29 +112,12 @@ int sum_degrees(vector<NodeSource> adjacency, vector<int> nodes) {
     return sum;
 }
 
-// calcula o número de arestas
-int calculate_edges_count(vector<NodeSource> adjacency) {
-    int count = 0;
-
-    for (int u = 0; u < adjacency.size(); u++) {
-        for (int v = 0; v < adjacency[u].adj.size(); v++) {
-            if (u < adjacency[u].adj[v].id) {
-                count++;
-            }
-        }
-    }
-
-    return count;
-}
-
 // arvore geradora minima com restricao de grau dos vertices
-vector<NodeSource> agm_with_degree_restriction(vector<NodeSource> adjacency) {
-    int nodes_count = adjacency.size();
-    int edges_count = calculate_edges_count(adjacency);
+vector<NodeSource> agm_with_degree_restriction(int V, int E, vector<NodeSource> adjacency) {
     vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(adjacency);
-    vector<int> degree(nodes_count, 0);
-    vector<int> component(nodes_count);
-    vector<int> degrees_component(nodes_count, 0);
+    vector<int> degree(V, 0);
+    vector<int> component(V);
+    vector<int> degrees_component(V, 0);
     vector< pair< pair<int, int>, int > > edges;
 
     make_set(&component);
@@ -145,7 +128,7 @@ vector<NodeSource> agm_with_degree_restriction(vector<NodeSource> adjacency) {
     int k = 0;
 
     // uma arvore tem V-1 arestas, e k nao deve ultrapassar o maximo de arestas de adjacency
-    while (edges.size() < nodes_count - 1 && k < edges_count) {
+    while (edges.size() < V - 1 && k < E) {
         int i = adjacency_edges[k].first.first;
         int j = adjacency_edges[k].first.second;
 
@@ -154,7 +137,7 @@ vector<NodeSource> agm_with_degree_restriction(vector<NodeSource> adjacency) {
             int cj = find_set(component, j);
 
             if (ci != cj) {
-                if (edges.size() == nodes_count - 2) {
+                if (edges.size() == V - 2) {
                     edges.push_back(adjacency_edges[k]);
 
                     union_set(&component, i, j);
@@ -186,7 +169,7 @@ vector<NodeSource> agm_with_degree_restriction(vector<NodeSource> adjacency) {
         k++;
     }
 
-    vector<NodeSource> agm_adjacency = transform(adjacency, edges, nodes_count);
+    vector<NodeSource> agm_adjacency = transform(adjacency, edges, V);
 
     // print_graph(agm_adjacency);
 
