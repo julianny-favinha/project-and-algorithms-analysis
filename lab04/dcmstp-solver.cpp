@@ -2,9 +2,11 @@
 #include "agm.hpp"
 #include "output.hpp"
 
+// número de iterações
 int iterations = 10;
 
-float best_dual = float(INT_MIN);
+// melhores valores / solução encontrados
+float best_dual = float(INT_MAX);
 float best_primal = float(INT_MAX);
 vector<NodeSource> best_agm;
 
@@ -45,7 +47,9 @@ vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<flo
 	return adjacency2;
 }
 
-// verifica se a lista de adjacencias é uma solução viavel
+// verifica se é uma solucao
+// como é uma arvore, cada vertice deve estar conectado a pelo menos uma aresta
+// não ultrapassar a restrição dos vertices
 bool is_solution(vector<NodeSource> adjacency) {
 	for (int i = 0; i < adjacency.size(); i++) {
 		if (adjacency[i].adj.size() < 1 || adjacency[i].adj.size() > adjacency[i].max_degree) {
@@ -92,14 +96,11 @@ vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, flo
 	vector<int> s(nodes);
 	int s_norm = 0;
 
-	// calcula vetor s
-	// calcula norma (ou modulo)
 	for (int i = 0; i < nodes; i++) {
 		s[i] = dual[i].adj.size() - dual[i].max_degree;
 		s_norm += s[i] * s[i];
 	}
 
-	// calcula t
 	float t = alpha*((1 + beta) * cost_primal - cost_dual) / s_norm;
 
 
@@ -121,13 +122,7 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
         	break;
     	}
 
-		// cout << "GRAFO ORIGINAL" << endl;
-		// print_graph(adjacency);
-
 		vector<NodeSource> adjacency_with_lambdas = increment_edges_cost(adjacency, lambdas);
-
-		// cout << "GRAFO COM LAMBDAS" << endl;
-		// print_graph(adjacency_with_lambdas);
 		
 		// calcula arvore geradora minima (limitante dual)
 		vector<NodeSource> dual_agm_with_lambdas = agm(adjacency_with_lambdas);
@@ -139,22 +134,21 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 
 		int cost_dual_with_lambdas = calculate_cost(dual_agm_with_lambdas);
 
-		cout << "GRAFO DUAL" << endl;
-		print_graph(dual_agm_with_lambdas);
-
 		vector<NodeSource> dual_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
 		int cost_dual = calculate_cost(dual_agm);
 
-		cout << "CUSTO DUAL: " << cost_dual << endl << endl;
+		if (time_expired()) {
+			cout << "TEMPO EXPIRADO" << endl;
+        	break;
+    	}
 
-		if (cost_dual > best_dual) {
+		if (cost_dual < best_dual) {
 			best_dual = cost_dual;
 		}
 
 		int cost_primal = best_primal;
 
 		if (is_solution(dual_agm)) {
-			// cout << "É PRIMAL TAMBÉM" << endl;
 			// se o dual é uma solução, então é um limitante primal também
 			vector<NodeSource> primal_agm = dual_agm;
 			cost_primal = calculate_cost(primal_agm);
@@ -173,11 +167,6 @@ void lagrangean_relaxation(vector<NodeSource> adjacency) {
 
 			vector<NodeSource> primal_agm = remove_lambdas(primal_agm_with_lambdas, lambdas);
 			cost_primal = calculate_cost(primal_agm);
-
-			cout << "GRAFO PRIMAL" << endl;
-			print_graph(primal_agm);
-
-			cout << "CUSTO PRIMAL: " << cost_primal << endl << endl;
 
 			if (cost_primal < best_primal) {
 				best_primal = cost_primal;
@@ -213,6 +202,10 @@ int main(int argc, char *argv[]) {
 		cout << "IMPLEMENTAR META-HEURÍSTICA" << endl;
 		cout << fixed << file_name << "," << setprecision(4) << best_primal << endl;
 	}
+
+	// clock_t finish = clock();
+	// double total_time_execution = ((finish - start) / (float)CLOCKS_PER_SEC);
+	// printf("%.2f\n", total_time_execution);
 
 	save_output(file_name, best_agm);
 

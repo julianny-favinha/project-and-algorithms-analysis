@@ -1,6 +1,5 @@
 #include "agm.hpp"
 
-
 // calcula custo de uma lista de adjacencias
 int calculate_cost(vector<NodeSource> adjacency) {
 	int cost = 0;
@@ -66,12 +65,14 @@ bool sort_cost_ascending(const pair< pair<int, int>, int > &rhs, const pair< pai
     return rhs.second < lhs.second;
 }
 
+// cria os componentes para cada vértice
 void make_set(vector<int> *c) {
     for (int i = 0; i < c->size(); i++) {
         (*c)[i] =  i;
     }
 }
 
+// procura o componente de um vertice
 int find_set(vector<int> c, int i) {
     if (i == c[i]) {
         return i;
@@ -80,6 +81,7 @@ int find_set(vector<int> c, int i) {
     return find_set(c, c[i]);
 }
 
+// une duas componentes
 void union_set(vector<int> *c, int i, int j) {
     int i1 = find_set(*c, i);
     int j1 = find_set(*c, j);
@@ -87,6 +89,7 @@ void union_set(vector<int> *c, int i, int j) {
     (*c)[j1] = i1;
 }
 
+// encontra os vérticesde uma componente
 vector<int> find_vertices(vector<int> c, int component) {
     vector<int> vertices;
     for (int i = 0; i < c.size(); i++) {
@@ -98,16 +101,18 @@ vector<int> find_vertices(vector<int> c, int component) {
     return vertices;
 }
 
-int sum_degrees(vector<NodeSource> adjacency, vector<int> vertices_ci) {
+// soma os graus de um vector de vertices
+int sum_degrees(vector<NodeSource> adjacency, vector<int> nodes) {
     int sum = 0;
 
-    for (int i = 0; i < vertices_ci.size(); i++) {
-        sum += adjacency[vertices_ci[i]].max_degree;
+    for (int i = 0; i < nodes.size(); i++) {
+        sum += adjacency[nodes[i]].max_degree;
     }
 
     return sum;
 }
 
+// calcula o número de arestas
 int calculate_edges_count(vector<NodeSource> adjacency) {
     int count = 0;
 
