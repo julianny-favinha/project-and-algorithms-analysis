@@ -1,8 +1,8 @@
 #include "agm.hpp"
 
 // calcula custo de uma lista de adjacencias
-int calculate_cost(vector<NodeSource> adjacency) {
-	int cost = 0;
+float calculate_cost(vector<NodeSource> adjacency) {
+	float cost = 0;
 	int nodes = adjacency.size();
 
 	for (int i = 0; i < nodes; i++) {
