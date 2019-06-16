@@ -208,10 +208,10 @@ int main(int argc, char *argv[]) {
 
 	if (string(method) == "l") {
 		lagrangean_relaxation(adjacency);
-		cout << file_name << "," << best_dual << "," << best_primal << endl;
+		cout << fixed << file_name << "," << setprecision(4) << best_dual << "," << setprecision(4) << best_primal << endl;
 	} else {
 		cout << "IMPLEMENTAR META-HEURÍSTICA" << endl;
-		cout << file_name << "," << best_primal << endl;
+		cout << fixed << file_name << "," << setprecision(4) << best_primal << endl;
 	}
 
 	save_output(file_name, best_agm);
