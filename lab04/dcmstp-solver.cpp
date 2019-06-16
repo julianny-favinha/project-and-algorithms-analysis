@@ -32,22 +32,6 @@ bool stop_subgradient() {
 	return false;
 }
 
-// calcula custo de uma lista de adjacencias
-int calculate_cost(vector<NodeSource> adjacency) {
-	int cost = 0;
-	int nodes = adjacency.size();
-
-	for (int i = 0; i < nodes; i++) {
-		for (int j = 0; j < adjacency[i].adj.size(); j++) {
-			if (i < adjacency[i].adj[j].id) {
-				cost += adjacency[i].adj[j].cost;
-			}
-		}
-	}
-
-	return cost;
-}
-
 // incrementa o custo das arestas (i,j): c_(i,j) += lambda(i) + lambda(j)
 vector<NodeSource> increment_edges_cost(vector<NodeSource> adjacency, vector<float> lambdas) {
 	vector<NodeSource> adjacency2 = adjacency;
