@@ -26,7 +26,7 @@ void print_graph(vector<NodeSource> adjacency) {
 	}
 }
 
-vector<NodeSource> read_file(char *name) {
+Graph read_file(char *name) {
 	ifstream file; 
 	file.open(name);
 
@@ -84,5 +84,10 @@ vector<NodeSource> read_file(char *name) {
 
 	// print_graph(adjacency);
 	
-	return adjacency;
+	Graph g;
+	g.V = nodes;
+	g.E = edges;
+	g.adjacency = adjacency;
+
+	return g;
 }

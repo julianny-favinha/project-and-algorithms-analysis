@@ -1,13 +1,11 @@
 #include "grasp.hpp"
 
 // arvore geradora minima com restricao de grau dos vertices
-vector<NodeSource> agm_grasp(vector<NodeSource> adjacency, float interval, int times) {
-    int nodes_count = adjacency.size();
-    int edges_count = calculate_edges_count(adjacency);
+vector<NodeSource> agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval, int times) {
     vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(adjacency);
-    vector<int> degree(nodes_count, 0);
-    vector<int> component(nodes_count);
-    vector<int> degrees_component(nodes_count, 0);
+    vector<int> degree(V, 0);
+    vector<int> component(V);
+    vector<int> degrees_component(V, 0);
     vector< pair< pair<int, int>, int > > edges;
     int better_cost = 0;
     vector<NodeSource> best_agm_adjacency;
@@ -35,7 +33,7 @@ vector<NodeSource> agm_grasp(vector<NodeSource> adjacency, float interval, int t
         }
 
         int k = 0;
-        while (edges.size() < nodes_count - 1 && k < edges_count) {
+        while (edges.size() < V - 1 && k < E) {
             int i = random_adjacency_edges[k].first.first;
             int j = random_adjacency_edges[k].first.second;
 
@@ -44,7 +42,7 @@ vector<NodeSource> agm_grasp(vector<NodeSource> adjacency, float interval, int t
                 int cj = find_set(component, j);
 
                 if (ci != cj) {
-                    if (edges.size() == nodes_count - 2) {
+                    if (edges.size() == V - 2) {
                         edges.push_back(random_adjacency_edges[k]);
 
                         union_set(&component, i, j);
@@ -76,7 +74,7 @@ vector<NodeSource> agm_grasp(vector<NodeSource> adjacency, float interval, int t
             k++;
         }
 
-        vector<NodeSource> agm_adjacency = transform(adjacency, edges, nodes_count);
+        vector<NodeSource> agm_adjacency = transform(adjacency, edges, V);
         int solution_cost = calculate_cost(agm_adjacency);
 
         if (better_cost == 0 || solution_cost < better_cost) {
