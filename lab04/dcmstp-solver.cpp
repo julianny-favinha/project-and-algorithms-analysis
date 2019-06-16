@@ -189,6 +189,7 @@ void lagrangean_relaxation(Graph g) {
 
 void grasp(Graph g) {
 	for (int i = 0; i < g.E * 100; i++) {
+	// for (int i = 0; i < 1; i++) {
 		if (time_expired()) {
 			cout << "TEMPO EXPIRADO" << endl;
         	break;
