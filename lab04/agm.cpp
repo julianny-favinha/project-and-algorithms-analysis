@@ -1,5 +1,22 @@
 #include "agm.hpp"
 
+
+// calcula custo de uma lista de adjacencias
+int calculate_cost(vector<NodeSource> adjacency) {
+	int cost = 0;
+	int nodes = adjacency.size();
+
+	for (int i = 0; i < nodes; i++) {
+		for (int j = 0; j < adjacency[i].adj.size(); j++) {
+			if (i < adjacency[i].adj[j].id) {
+				cost += adjacency[i].adj[j].cost;
+			}
+		}
+	}
+
+	return cost;
+}
+
 // cria um vector de arestas
 vector< pair< pair<int, int>, int > > create_adjacency_edges(vector<NodeSource> adjacency) {
     vector< pair< pair<int, int>, int > > adjacency_edges;
