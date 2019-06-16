@@ -20,22 +20,22 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval) {
 
     int numericInterval = (int) adjacency_edges.size() * interval;
     int beginInterval = 0;
-    vector< pair< pair<int, int>, int > > random_adjacency_edges;
 
-    for (int i = 0; i < adjacency_edges.size(); i++) {
-        int rand_index = rand() % numericInterval + beginInterval;
-        random_adjacency_edges.push_back(adjacency_edges_copy[rand_index]);
+    for (int i = 0; i < E; i++) {
+        int rand_index = rand() % (numericInterval - beginInterval) + beginInterval;
+        pair< pair<int, int>, int > edge = adjacency_edges_copy[rand_index];
         adjacency_edges_copy[rand_index] = adjacency_edges_copy[i];
+        adjacency_edges_copy[i] = edge;
         beginInterval++;
-        if (numericInterval < adjacency_edges.size()) {
+        if (numericInterval < E) {
             numericInterval++;
         }
     }
 
     int k = 0;
     while (edges.size() < V - 1 && k < E) {
-        int i = random_adjacency_edges[k].first.first;
-        int j = random_adjacency_edges[k].first.second;
+        int i = adjacency_edges_copy[k].first.first;
+        int j = adjacency_edges_copy[k].first.second;
 
         if (degree[i] < adjacency[i].max_degree && degree[j] < adjacency[j].max_degree) {
             int ci = find_set(component, i);
@@ -43,7 +43,7 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval) {
 
             if (ci != cj) {
                 if (edges.size() == V - 2) {
-                    edges.push_back(random_adjacency_edges[k]);
+                    edges.push_back(adjacency_edges_copy[k]);
 
                     union_set(&component, i, j);
                     int sum_union = degrees_component[i] + degrees_component[j] + 2;
@@ -56,7 +56,7 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval) {
                     int sum_degrees_components = sum_degrees(adjacency, vertices_ci) + sum_degrees(adjacency, vertices_cj);
 
                     if (degrees_component[i] + degrees_component[j] + 2 < sum_degrees_components) {
-                        edges.push_back(random_adjacency_edges[k]);
+                        edges.push_back(adjacency_edges_copy[k]);
 
                         union_set(&component, i, j);
 
