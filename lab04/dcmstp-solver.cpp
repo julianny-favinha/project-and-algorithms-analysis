@@ -1,6 +1,7 @@
 #include "input.hpp"
 #include "agm.hpp"
 #include "output.hpp"
+#include "grasp.hpp"
 
 // número de iterações
 int iterations = 10;
@@ -186,6 +187,21 @@ void lagrangean_relaxation(Graph g) {
 	}
 }
 
+void grasp(Graph g) {
+	for (int i = 0; i < g.E * 100; i++) {
+		if (time_expired()) {
+			cout << "TEMPO EXPIRADO" << endl;
+        	break;
+    	}
+		Agm result = agm_grasp(g.V, g.E, g.adjacency, 0.3);
+		if (best_primal == 0 || result.cost < best_primal) {
+            best_primal = result.cost;
+            best_agm = result.adjacency;
+        }
+	}
+	
+}
+
 int main(int argc, char *argv[]) {
 	start = clock();
 
@@ -200,7 +216,7 @@ int main(int argc, char *argv[]) {
 		lagrangean_relaxation(g);
 		printf("%s,%.4f,%.4f\n", file_name, best_dual, best_primal);
 	} else {
-		cout << "IMPLEMENTAR META-HEURÍSTICA" << endl;
+		grasp(g);
 		printf("%s,%.4f\n", file_name, best_primal);
 	}
 
