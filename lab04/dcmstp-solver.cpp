@@ -216,7 +216,7 @@ void lagrangean_relaxation(Graph g) {
 }
 
 void grasp(Graph g) {
-	vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(g.adjacency);
+	vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(g.adjacency);
 	sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
 	for (int i = 0; i < g.E * 10; i++) {
 	// for (int i = 0; i < 1; i++) {
