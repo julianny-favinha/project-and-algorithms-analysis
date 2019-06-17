@@ -12,8 +12,8 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int
     result.cost = 0;
 
     // ordena de acordo com o custo da aresta
-    vector< pair< pair<int, int>, int > > agm_edges;
-    vector< pair< pair<int, int>, int > > adjacency_edges_copy = adjacency_edges;
+    vector< pair< pair<int, int>, float > > agm_edges;
+    vector< pair< pair<int, int>, float > > adjacency_edges_copy = adjacency_edges;
 
     int numericInterval = (int) adjacency_edges.size() * interval;
     int beginInterval = 0;
