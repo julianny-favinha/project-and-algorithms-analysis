@@ -1,8 +1,7 @@
 #include "grasp.hpp"
 
 // arvore geradora minima com restricao de grau dos vertices
-Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval) {
-    vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(adjacency);
+Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int, int>, int > > adjacency_edges, float interval) {
     vector<int> degree(V, 0);
     vector<int> component(V);
     vector<int> degrees_component(V, 0);
@@ -13,8 +12,6 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval) {
     result.cost = 0;
 
     // ordena de acordo com o custo da aresta
-    sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
-
     vector< pair< pair<int, int>, int > > agm_edges;
     vector< pair< pair<int, int>, int > > adjacency_edges_copy = adjacency_edges;
 
