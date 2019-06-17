@@ -2,11 +2,11 @@
 
 // arvore geradora minima com restricao de grau dos vertices
 Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval) {
-    vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(adjacency);
+    vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
     vector<int> degree(V, 0);
     vector<int> component(V);
     vector<int> degrees_component(V, 0);
-    vector< pair< pair<int, int>, int > > edges;
+    vector< pair< pair<int, int>, float > > edges;
     Agm result;
 
     make_set(&component);
@@ -15,15 +15,15 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval) {
     // ordena de acordo com o custo da aresta
     sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
 
-    vector< pair< pair<int, int>, int > > agm_edges;
-    vector< pair< pair<int, int>, int > > adjacency_edges_copy = adjacency_edges;
+    vector< pair< pair<int, int>, float > > agm_edges;
+    vector< pair< pair<int, int>, float > > adjacency_edges_copy = adjacency_edges;
 
     int numericInterval = (int) adjacency_edges.size() * interval;
     int beginInterval = 0;
 
     for (int i = 0; i < E; i++) {
         int rand_index = rand() % (numericInterval - beginInterval) + beginInterval;
-        pair< pair<int, int>, int > edge = adjacency_edges_copy[rand_index];
+        pair< pair<int, int>, float > edge = adjacency_edges_copy[rand_index];
         adjacency_edges_copy[rand_index] = adjacency_edges_copy[i];
         adjacency_edges_copy[i] = edge;
         beginInterval++;

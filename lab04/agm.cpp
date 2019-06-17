@@ -7,18 +7,16 @@ float calculate_cost(vector<NodeSource> adjacency) {
 
 	for (int i = 0; i < nodes; i++) {
 		for (int j = 0; j < adjacency[i].adj.size(); j++) {
-			if (i < adjacency[i].adj[j].id) {
-				cost += adjacency[i].adj[j].cost;
-			}
+			cost += adjacency[i].adj[j].cost;
 		}
 	}
 
-	return cost;
+	return cost/2;
 }
 
 // cria um vector de arestas
-vector< pair< pair<int, int>, int > > create_adjacency_edges(vector<NodeSource> adjacency) {
-    vector< pair< pair<int, int>, int > > adjacency_edges;
+vector< pair< pair<int, int>, float > > create_adjacency_edges(vector<NodeSource> adjacency) {
+    vector< pair< pair<int, int>, float > > adjacency_edges;
 
     for (int u = 0; u < adjacency.size(); u++) {
         for (int v = 0; v < adjacency[u].adj.size(); v++) {
@@ -32,7 +30,7 @@ vector< pair< pair<int, int>, int > > create_adjacency_edges(vector<NodeSource> 
 }
 
 // transforma um vector de arestas em um vector de NodeSource
-vector<NodeSource> transform(vector<NodeSource> adjacency, vector< pair< pair<int, int>, int > > agm_edges, int nodes) {
+vector<NodeSource> transform(vector<NodeSource> adjacency, vector< pair< pair<int, int>, float > > agm_edges, int nodes) {
     vector<NodeSource> agm_adjacency(nodes);
 
     for (int i = 0; i < nodes; i++) {
@@ -61,7 +59,7 @@ vector<NodeSource> transform(vector<NodeSource> adjacency, vector< pair< pair<in
 }
 
 // ordena custo crescentemente
-bool sort_cost_ascending(const pair< pair<int, int>, int > &rhs, const pair< pair<int, int>, int > &lhs) {
+bool sort_cost_ascending(const pair< pair<int, int>, float > &rhs, const pair< pair<int, int>, float > &lhs) {
     return rhs.second < lhs.second;
 }
 
@@ -114,11 +112,11 @@ int sum_degrees(vector<NodeSource> adjacency, vector<int> nodes) {
 
 // arvore geradora minima com restricao de grau dos vertices
 vector<NodeSource> agm_with_degree_restriction(int V, int E, vector<NodeSource> adjacency) {
-    vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(adjacency);
+    vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
     vector<int> degree(V, 0);
     vector<int> component(V);
     vector<int> degrees_component(V, 0);
-    vector< pair< pair<int, int>, int > > edges;
+    vector< pair< pair<int, int>, float > > edges;
 
     make_set(&component);
 
@@ -171,15 +169,13 @@ vector<NodeSource> agm_with_degree_restriction(int V, int E, vector<NodeSource> 
 
     vector<NodeSource> agm_adjacency = transform(adjacency, edges, V);
 
-    // print_graph(agm_adjacency);
-
     return agm_adjacency;
 }
 
 // arvore geradora minima
 vector<NodeSource> agm(vector<NodeSource> adjacency) {
 	int nodes = adjacency.size();
-    vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(adjacency);
+    vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
     vector<int> component(nodes);
 
     make_set(&component);
@@ -188,7 +184,7 @@ vector<NodeSource> agm(vector<NodeSource> adjacency) {
     sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
 
     int k = 0;
-    vector< pair< pair<int, int>, int > > agm_edges;
+    vector< pair< pair<int, int>, float > > agm_edges;
 
     while (agm_edges.size() < nodes - 1) {
         int i = adjacency_edges[k].first.first;
@@ -204,6 +200,11 @@ vector<NodeSource> agm(vector<NodeSource> adjacency) {
 
         k++;
     }
+
+    // for (int i = 0; i < nodes; i++) {
+    //     cout << find_set(component, i) << " ";
+    // }
+    // cout << endl;
 
     vector<NodeSource> agm_adjacency = transform(adjacency, agm_edges, nodes);
 

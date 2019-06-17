@@ -4,10 +4,12 @@
 #include "grasp.hpp"
 
 // número de iterações
-int iterations = 10;
+int iterations = 100;
+
+float alpha = 0.2;
 
 // melhores valores / solução encontrados
-float best_dual = float(INT_MAX);
+float best_dual = float(INT_MIN);
 float best_primal = float(INT_MAX);
 vector<NodeSource> best_agm;
 
@@ -27,7 +29,7 @@ bool time_expired() {
 
 // retorna true quando ocorreram todas as iterações OU se o limitante dual é igual ao primal
 bool stop_subgradient() {
-	if (iterations == 0 || (best_dual == best_primal && best_primal != float(INT_MAX))) {
+	if (iterations == 0 || best_primal < best_dual) {
 		return true;
 	}
 
@@ -67,7 +69,7 @@ vector<NodeSource> remove_lambdas(vector<NodeSource> adjacency, vector<float> la
 
 	for (int i = 0; i < result.size(); i++) {
 		for (int j = 0; j < result[i].adj.size(); j++) {
-			result[i].adj[j].cost = result[i].adj[j].cost - lambdas[i] - lambdas[result[i].adj[j].id];
+			result[i].adj[j].cost -= (lambdas[i] + lambdas[result[i].adj[j].id]);
 		}
 	}
 
@@ -79,7 +81,7 @@ vector<float> first_lambda(int n) {
 	vector<float> lambdas(n);
 
 	for (int i = 0; i < lambdas.size(); i++) {
-		lambdas[i] = 1.0;
+		lambdas[i] = 0.0;
 	}
 
 	return lambdas;
@@ -91,7 +93,6 @@ vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, flo
 
 	vector<float> new_lambdas(nodes);
 
-	float alpha = 2.0;
 	float beta = 0.03;
 
 	vector<int> s(nodes);
@@ -117,6 +118,7 @@ vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, flo
 void lagrangean_relaxation(Graph g) {
 	vector<NodeSource> adjacency = g.adjacency;
 	vector<float> lambdas = first_lambda(g.V);
+	int no_progress = 0;
 
 	while (stop_subgradient() == false) {
 		if (time_expired()) {
@@ -125,9 +127,16 @@ void lagrangean_relaxation(Graph g) {
     	}
 
 		vector<NodeSource> adjacency_with_lambdas = increment_edges_cost(adjacency, lambdas);
-		
+
 		// calcula arvore geradora minima (limitante dual)
 		vector<NodeSource> dual_agm_with_lambdas = agm(adjacency_with_lambdas);
+
+
+		// cout << "alpha: " << alpha << endl;
+		// for (int i = 0; i < lambdas.size(); i++) {
+		// 	cout << lambdas[i] << " ";
+		// }
+		// cout <<endl;
 
 		if (time_expired()) {
 			cout << "TEMPO EXPIRADO" << endl;
@@ -136,31 +145,32 @@ void lagrangean_relaxation(Graph g) {
 
 		int cost_dual_with_lambdas = calculate_cost(dual_agm_with_lambdas);
 
-		vector<NodeSource> dual_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
-		int cost_dual = calculate_cost(dual_agm);
+		// vector<NodeSource> dual_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
+		// float cost_dual = calculate_cost(dual_agm);
 
 		if (time_expired()) {
 			cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
 
-		if (cost_dual < best_dual) {
-			best_dual = cost_dual;
-		}
-
 		int cost_primal = best_primal;
 
-		if (is_solution(dual_agm)) {
+		if (is_solution(dual_agm_with_lambdas)) {
 			// se o dual é uma solução, então é um limitante primal também
-			vector<NodeSource> primal_agm = dual_agm;
+			vector<NodeSource> primal_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
 			cost_primal = calculate_cost(primal_agm);
+
+			// cout << "CUSTO PRIMAL: " << cost_primal << endl;
 
 			if (cost_primal < best_primal) {
 				best_primal = cost_primal;
 				best_agm = primal_agm;
+				cout << "CUSTO PRIMAL1: " << best_primal << endl;
 			}
 		} else {
 			vector<NodeSource> primal_agm_with_lambdas = agm_with_degree_restriction(g.V, g.E, adjacency_with_lambdas);
+
+
 
 			if (time_expired()) {
 				cout << "TEMPO EXPIRADO" << endl;
@@ -173,7 +183,21 @@ void lagrangean_relaxation(Graph g) {
 			if (cost_primal < best_primal) {
 				best_primal = cost_primal;
 				best_agm = primal_agm;
+				cout << "CUSTO PRIMAL2: " << best_primal << endl;
+				if(best_dual > best_primal) {
+					best_dual = best_primal;
+					no_progress = 0;
+					cout << "CUSTO DUAL: "<< best_dual <<endl;
+				}
 			}
+		}
+
+		if (cost_dual_with_lambdas > best_dual && cost_dual_with_lambdas < best_primal) {
+			best_dual = cost_dual_with_lambdas;
+			no_progress = 0;
+			cout << "CUSTO DUAL: "<< best_dual <<endl;
+		} else {
+			no_progress++;
 		}
 
 		if (time_expired()) {
@@ -181,7 +205,11 @@ void lagrangean_relaxation(Graph g) {
         	break;
     	}
 
-		vector<float> new_lambdas = update_lambdas(lambdas, dual_agm_with_lambdas, cost_dual_with_lambdas, cost_primal);
+    	if(no_progress > 0 && no_progress % 15 == 0) {
+    		alpha = alpha / 1.2;
+    	}
+
+		vector<float> new_lambdas = update_lambdas(lambdas, dual_agm_with_lambdas, cost_dual_with_lambdas, best_primal);
 
 		lambdas = new_lambdas;
 	}
