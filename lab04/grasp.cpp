@@ -1,11 +1,11 @@
 #include "grasp.hpp"
 
 // arvore geradora minima com restricao de grau dos vertices
-Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int, int>, int > > adjacency_edges, float interval) {
+Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int, int>, float > > adjacency_edges, float interval) {
     vector<int> degree(V, 0);
     vector<int> component(V);
     vector<int> degrees_component(V, 0);
-    vector< pair< pair<int, int>, int > > edges;
+    vector< pair< pair<int, int>, float > > edges;
     Agm result;
 
     make_set(&component);
@@ -20,7 +20,7 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int
 
     for (int i = 0; i < E; i++) {
         int rand_index = rand() % (numericInterval - beginInterval) + beginInterval;
-        pair< pair<int, int>, int > edge = adjacency_edges_copy[rand_index];
+        pair< pair<int, int>, float > edge = adjacency_edges_copy[rand_index];
         adjacency_edges_copy[rand_index] = adjacency_edges_copy[i];
         adjacency_edges_copy[i] = edge;
         beginInterval++;

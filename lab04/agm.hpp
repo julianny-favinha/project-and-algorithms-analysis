@@ -5,10 +5,10 @@
 
 using namespace std;
 
-int calculate_cost(vector<NodeSource> adjacency);
-vector< pair< pair<int, int>, int > > create_adjacency_edges(vector<NodeSource> adjacency);
-vector<NodeSource> transform(vector<NodeSource> adjacency, vector< pair< pair<int, int>, int > > agm_edges, int nodes);
-bool sort_cost_ascending(const pair< pair<int, int>, int > &rhs, const pair< pair<int, int>, int > &lhs);
+float calculate_cost(vector<NodeSource> adjacency);
+vector< pair< pair<int, int>, float > > create_adjacency_edges(vector<NodeSource> adjacency);
+vector<NodeSource> transform(vector<NodeSource> adjacency, vector< pair< pair<int, int>, float > > agm_edges, int nodes);
+bool sort_cost_ascending(const pair< pair<int, int>, float > &rhs, const pair< pair<int, int>, float > &lhs);
 void make_set(vector<int> *c);
 int find_set(vector<int> c, int i);
 void union_set(vector<int> *c, int i, int j);
