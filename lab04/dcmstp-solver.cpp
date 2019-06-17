@@ -188,13 +188,15 @@ void lagrangean_relaxation(Graph g) {
 }
 
 void grasp(Graph g) {
-	for (int i = 0; i < g.E * 100; i++) {
+	vector< pair< pair<int, int>, int > > adjacency_edges = create_adjacency_edges(g.adjacency);
+	sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
+	for (int i = 0; i < g.E * 10; i++) {
 	// for (int i = 0; i < 1; i++) {
 		if (time_expired()) {
 			cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
-		Agm result = agm_grasp(g.V, g.E, g.adjacency, 0.3);
+		Agm result = agm_grasp(g.V, g.E, g.adjacency, adjacency_edges, 0.01);
 		if (best_primal == 0 || result.cost < best_primal) {
             best_primal = result.cost;
             best_agm = result.adjacency;
