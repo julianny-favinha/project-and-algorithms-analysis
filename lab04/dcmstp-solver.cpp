@@ -122,7 +122,7 @@ void lagrangean_relaxation(Graph g) {
 
 	while (stop_subgradient() == false) {
 		if (time_expired()) {
-			cout << "TEMPO EXPIRADO" << endl;
+			// cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
 
@@ -139,7 +139,7 @@ void lagrangean_relaxation(Graph g) {
 		// cout <<endl;
 
 		if (time_expired()) {
-			cout << "TEMPO EXPIRADO" << endl;
+			// cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
 
@@ -149,7 +149,7 @@ void lagrangean_relaxation(Graph g) {
 		// float cost_dual = calculate_cost(dual_agm);
 
 		if (time_expired()) {
-			cout << "TEMPO EXPIRADO" << endl;
+			// cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
 
@@ -165,7 +165,7 @@ void lagrangean_relaxation(Graph g) {
 			if (cost_primal < best_primal) {
 				best_primal = cost_primal;
 				best_agm = primal_agm;
-				cout << "CUSTO PRIMAL1: " << best_primal << endl;
+				// cout << "CUSTO PRIMAL1: " << best_primal << endl;
 			}
 		} else {
 			vector<NodeSource> primal_agm_with_lambdas = agm_with_degree_restriction(g.V, g.E, adjacency_with_lambdas);
@@ -173,7 +173,7 @@ void lagrangean_relaxation(Graph g) {
 
 
 			if (time_expired()) {
-				cout << "TEMPO EXPIRADO" << endl;
+				// cout << "TEMPO EXPIRADO" << endl;
 	        	break;
     		}
 
@@ -183,11 +183,11 @@ void lagrangean_relaxation(Graph g) {
 			if (cost_primal < best_primal) {
 				best_primal = cost_primal;
 				best_agm = primal_agm;
-				cout << "CUSTO PRIMAL2: " << best_primal << endl;
+				// cout << "CUSTO PRIMAL2: " << best_primal << endl;
 				if(best_dual > best_primal) {
 					best_dual = best_primal;
 					no_progress = 0;
-					cout << "CUSTO DUAL: "<< best_dual <<endl;
+					// cout << "CUSTO DUAL: "<< best_dual <<endl;
 				}
 			}
 		}
@@ -195,13 +195,13 @@ void lagrangean_relaxation(Graph g) {
 		if (cost_dual_with_lambdas > best_dual && cost_dual_with_lambdas < best_primal) {
 			best_dual = cost_dual_with_lambdas;
 			no_progress = 0;
-			cout << "CUSTO DUAL: "<< best_dual <<endl;
+			// cout << "CUSTO DUAL: "<< best_dual <<endl;
 		} else {
 			no_progress++;
 		}
 
 		if (time_expired()) {
-			cout << "TEMPO EXPIRADO" << endl;
+			// cout << "TEMPO EXPIRADO" << endl;
         	break;
     	}
 
