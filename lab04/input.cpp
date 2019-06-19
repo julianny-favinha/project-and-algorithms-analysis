@@ -1,5 +1,13 @@
 #include "input.hpp"
 
+// verifica se tempo expirou
+bool time_expired(clock_t start_time, int max_time) {
+    clock_t finish_time = clock();
+    int total_time_execution = (int) ((finish_time - start_time) / (float)CLOCKS_PER_SEC);
+
+    return total_time_execution > max_time;
+}
+
 // retorna um vetor de nodes posições com o grau de cada vértice
 vector<int> calculate_degrees(vector<NodeSource> adjacency) {
 	vector<int> degrees(adjacency.size());

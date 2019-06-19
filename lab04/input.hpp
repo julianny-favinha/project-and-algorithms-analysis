@@ -44,5 +44,6 @@ struct Graph {
 Graph read_file(char *name);
 void print_graph(vector<NodeSource> adjacency);
 vector<int> calculate_degrees(vector<NodeSource> adjacency);
+bool time_expired(clock_t start_time, int max_time);
 
 #endif /* input_hpp */

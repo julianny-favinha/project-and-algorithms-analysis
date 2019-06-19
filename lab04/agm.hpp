@@ -14,7 +14,7 @@ int find_set(vector<int> c, int i);
 void union_set(vector<int> *c, int i, int j);
 vector<int> find_vertices(vector<int> c, int component);
 int sum_degrees(vector<NodeSource> adjacency, vector<int> vertices_ci);
-vector<NodeSource> agm(vector<NodeSource> adjacency);
-vector<NodeSource> agm_with_degree_restriction(int V, int E, vector<NodeSource> adjacency);
+pair< bool, vector<NodeSource> > agm(vector<NodeSource> adjacency, clock_t start_time, int max_time);
+pair< bool, vector<NodeSource> > agm_with_degree_restriction(int V, int E, vector<NodeSource> adjacency, clock_t start_time, int max_time);
 
 #endif /* agm_hpp */

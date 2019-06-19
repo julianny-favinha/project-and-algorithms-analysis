@@ -111,7 +111,7 @@ int sum_degrees(vector<NodeSource> adjacency, vector<int> nodes) {
 }
 
 // arvore geradora minima com restricao de grau dos vertices
-vector<NodeSource> agm_with_degree_restriction(int V, int E, vector<NodeSource> adjacency) {
+pair< bool, vector<NodeSource> > agm_with_degree_restriction(int V, int E, vector<NodeSource> adjacency, clock_t start_time, int max_time) {
     vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
     vector<int> degree(V, 0);
     vector<int> component(V);
@@ -127,6 +127,10 @@ vector<NodeSource> agm_with_degree_restriction(int V, int E, vector<NodeSource> 
 
     // uma arvore tem V-1 arestas, e k nao deve ultrapassar o maximo de arestas de adjacency
     while (edges.size() < V - 1 && k < E) {
+        if (time_expired(start_time, max_time)) {
+            return make_pair(false, adjacency);
+        }
+
         int i = adjacency_edges[k].first.first;
         int j = adjacency_edges[k].first.second;
 
@@ -169,11 +173,11 @@ vector<NodeSource> agm_with_degree_restriction(int V, int E, vector<NodeSource> 
 
     vector<NodeSource> agm_adjacency = transform(adjacency, edges, V);
 
-    return agm_adjacency;
+    return make_pair(true, agm_adjacency);
 }
 
 // arvore geradora minima
-vector<NodeSource> agm(vector<NodeSource> adjacency) {
+pair< bool, vector<NodeSource> > agm(vector<NodeSource> adjacency, clock_t start_time, int max_time) {
 	int nodes = adjacency.size();
     vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
     vector<int> component(nodes);
@@ -187,6 +191,10 @@ vector<NodeSource> agm(vector<NodeSource> adjacency) {
     vector< pair< pair<int, int>, float > > agm_edges;
 
     while (agm_edges.size() < nodes - 1) {
+        if (time_expired(start_time, max_time)) {
+            return make_pair(false, adjacency);
+        }
+
         int i = adjacency_edges[k].first.first;
         int j = adjacency_edges[k].first.second;
 
@@ -201,14 +209,9 @@ vector<NodeSource> agm(vector<NodeSource> adjacency) {
         k++;
     }
 
-    // for (int i = 0; i < nodes; i++) {
-    //     cout << find_set(component, i) << " ";
-    // }
-    // cout << endl;
-
     vector<NodeSource> agm_adjacency = transform(adjacency, agm_edges, nodes);
 
     // print_graph(agm_adjacency);
 
-    return agm_adjacency;
+    return make_pair(true, agm_adjacency);
 }

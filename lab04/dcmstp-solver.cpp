@@ -14,20 +14,12 @@ float best_primal = float(INT_MAX);
 vector<NodeSource> best_agm;
 
 // tempo de inicio de execucao
-clock_t start;
+clock_t start_time;
 
 // tempo maximo de execucao
 int max_time;
 
-// verifica se tempo expirou
-bool time_expired() {
-    clock_t finish = clock();
-    int total_time_execution = (int) ((finish - start) / (float)CLOCKS_PER_SEC);
-
-    return total_time_execution > max_time;
-}
-
-// retorna true quando ocorreram todas as iterações OU se o limitante dual é igual ao primal
+// retorna true quando ocorreram todas as iterações OU se o limitante primal é menor que o dual
 bool stop_subgradient() {
 	if (iterations == 0 || best_primal < best_dual) {
 		return true;
@@ -121,120 +113,112 @@ void lagrangean_relaxation(Graph g) {
 	int no_progress = 0;
 
 	while (stop_subgradient() == false) {
-		if (time_expired()) {
-			// cout << "TEMPO EXPIRADO" << endl;
+		if (time_expired(start_time, max_time)) {
         	break;
     	}
 
 		vector<NodeSource> adjacency_with_lambdas = increment_edges_cost(adjacency, lambdas);
 
 		// calcula arvore geradora minima (limitante dual)
-		vector<NodeSource> dual_agm_with_lambdas = agm(adjacency_with_lambdas);
+		pair< bool, vector<NodeSource> > result_dual = agm(adjacency_with_lambdas, start_time, max_time);
 
+		if (result_dual.first == true) {
+			vector<NodeSource> dual_agm_with_lambdas = result_dual.second;
 
-		// cout << "alpha: " << alpha << endl;
-		// for (int i = 0; i < lambdas.size(); i++) {
-		// 	cout << lambdas[i] << " ";
-		// }
-		// cout <<endl;
+			int cost_dual_with_lambdas = calculate_cost(dual_agm_with_lambdas);
 
-		if (time_expired()) {
-			// cout << "TEMPO EXPIRADO" << endl;
-        	break;
-    	}
+			int cost_primal = best_primal;
 
-		int cost_dual_with_lambdas = calculate_cost(dual_agm_with_lambdas);
+			if (is_solution(dual_agm_with_lambdas)) {
+				// se o dual é uma solução, então é um limitante primal também
+				vector<NodeSource> primal_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
+				cost_primal = calculate_cost(primal_agm);
 
-		// vector<NodeSource> dual_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
-		// float cost_dual = calculate_cost(dual_agm);
+				if (time_expired(start_time, max_time)) {
+	        		break;
+	    		}
 
-		if (time_expired()) {
-			// cout << "TEMPO EXPIRADO" << endl;
-        	break;
-    	}
+				if (cost_primal < best_primal) {
+					best_primal = cost_primal;
+					best_agm = primal_agm;
+				}
+			} else {
+				pair< bool, vector<NodeSource> > result_primal = agm_with_degree_restriction(g.V, g.E, adjacency_with_lambdas, start_time, max_time);
 
-		int cost_primal = best_primal;
+				if (result_primal.first == true) {
+					vector<NodeSource> primal_agm_with_lambdas = result_primal.second;
 
-		if (is_solution(dual_agm_with_lambdas)) {
-			// se o dual é uma solução, então é um limitante primal também
-			vector<NodeSource> primal_agm = remove_lambdas(dual_agm_with_lambdas, lambdas);
-			cost_primal = calculate_cost(primal_agm);
+					if (time_expired(start_time, max_time)) {
+			        	break;
+		    		}
 
-			// cout << "CUSTO PRIMAL: " << cost_primal << endl;
+					vector<NodeSource> primal_agm = remove_lambdas(primal_agm_with_lambdas, lambdas);
+					cost_primal = calculate_cost(primal_agm);
 
-			if (cost_primal < best_primal) {
-				best_primal = cost_primal;
-				best_agm = primal_agm;
-				// cout << "CUSTO PRIMAL1: " << best_primal << endl;
-			}
-		} else {
-			vector<NodeSource> primal_agm_with_lambdas = agm_with_degree_restriction(g.V, g.E, adjacency_with_lambdas);
+					if (time_expired(start_time, max_time)) {
+			        	break;
+		    		}
 
-
-
-			if (time_expired()) {
-				// cout << "TEMPO EXPIRADO" << endl;
-	        	break;
-    		}
-
-			vector<NodeSource> primal_agm = remove_lambdas(primal_agm_with_lambdas, lambdas);
-			cost_primal = calculate_cost(primal_agm);
-
-			if (cost_primal < best_primal) {
-				best_primal = cost_primal;
-				best_agm = primal_agm;
-				// cout << "CUSTO PRIMAL2: " << best_primal << endl;
-				if(best_dual > best_primal) {
-					best_dual = best_primal;
-					no_progress = 0;
-					// cout << "CUSTO DUAL: "<< best_dual <<endl;
+					if (cost_primal < best_primal) {
+						best_primal = cost_primal;
+						best_agm = primal_agm;
+						if(best_dual > best_primal) {
+							best_dual = best_primal;
+							no_progress = 0;
+						}
+					}
+				} else {
+					break;
 				}
 			}
-		}
 
-		if (cost_dual_with_lambdas > best_dual && cost_dual_with_lambdas < best_primal) {
-			best_dual = cost_dual_with_lambdas;
-			no_progress = 0;
-			// cout << "CUSTO DUAL: "<< best_dual <<endl;
+			if (cost_dual_with_lambdas > best_dual && cost_dual_with_lambdas < best_primal) {
+				best_dual = cost_dual_with_lambdas;
+				no_progress = 0;
+			} else {
+				no_progress++;
+			}
+
+	    	if (no_progress > 0 && no_progress % 15 == 0) {
+	    		alpha = alpha / 1.2;
+	    	}
+
+			vector<float> new_lambdas = update_lambdas(lambdas, dual_agm_with_lambdas, cost_dual_with_lambdas, best_primal);
+
+			if (time_expired(start_time, max_time)) {
+		       	break;
+	    	}
+
+			lambdas = new_lambdas;
 		} else {
-			no_progress++;
+			break;
 		}
-
-		if (time_expired()) {
-			// cout << "TEMPO EXPIRADO" << endl;
-        	break;
-    	}
-
-    	if(no_progress > 0 && no_progress % 15 == 0) {
-    		alpha = alpha / 1.2;
-    	}
-
-		vector<float> new_lambdas = update_lambdas(lambdas, dual_agm_with_lambdas, cost_dual_with_lambdas, best_primal);
-
-		lambdas = new_lambdas;
 	}
 }
 
 void grasp(Graph g) {
-	vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(g.adjacency);
-	sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
 	for (int i = 0; i < g.E * 10; i++) {
-	// for (int i = 0; i < 1; i++) {
-		if (time_expired()) {
-			cout << "TEMPO EXPIRADO" << endl;
+		if (time_expired(start_time, max_time)) {
         	break;
     	}
-		Agm result = agm_grasp(g.V, g.E, g.adjacency, adjacency_edges, 0.01);
-		if (best_primal == 0 || result.cost < best_primal) {
-            best_primal = result.cost;
-            best_agm = result.adjacency;
-        }
+
+		pair< bool, vector<NodeSource> > result = agm_grasp(g.V, g.E, g.adjacency, 0.01, start_time, max_time);
+
+		if (result.first == true) {
+			float cost = calculate_cost(result.second);
+
+			if (best_primal == 0 || cost < best_primal) {
+           		best_primal = cost;
+           		best_agm = result.second;
+        	}
+		} else {
+			break;
+		}
 	}
-	
 }
 
 int main(int argc, char *argv[]) {
-	start = clock();
+	start_time = clock();
 
 	char *file_name = argv[1];
 	int time = atoi(argv[2]);
@@ -251,9 +235,9 @@ int main(int argc, char *argv[]) {
 		printf("%s,%.4f\n", file_name, best_primal);
 	}
 
-	// clock_t finish = clock();
-	// double total_time_execution = ((finish - start) / (float)CLOCKS_PER_SEC);
-	// printf("%.2f\n", total_time_execution);
+	clock_t finish_time = clock();
+	double total_time_execution = ((finish_time - start_time) / (float)CLOCKS_PER_SEC);
+	printf("%.2f\n", total_time_execution);
 
 	save_output(file_name, best_agm);
 

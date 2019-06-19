@@ -1,15 +1,17 @@
 #include "grasp.hpp"
 
 // arvore geradora minima com restricao de grau dos vertices
-Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int, int>, float > > adjacency_edges, float interval) {
+// seleciona randomicamente um set de arestas
+pair< bool, vector<NodeSource>> agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval, clock_t start_time, int max_time) {
+    vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
+    sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
+
     vector<int> degree(V, 0);
     vector<int> component(V);
     vector<int> degrees_component(V, 0);
     vector< pair< pair<int, int>, float > > edges;
-    Agm result;
 
     make_set(&component);
-    result.cost = 0;
 
     // ordena de acordo com o custo da aresta
     vector< pair< pair<int, int>, float > > agm_edges;
@@ -31,6 +33,10 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int
 
     int k = 0;
     while (edges.size() < V - 1 && k < E) {
+        if (time_expired(start_time, max_time)) {
+            return make_pair(false, adjacency);
+        }
+
         int i = adjacency_edges_copy[k].first.first;
         int j = adjacency_edges_copy[k].first.second;
 
@@ -71,8 +77,5 @@ Agm agm_grasp(int V, int E, vector<NodeSource> adjacency, vector< pair< pair<int
         k++;
     }
 
-    result.adjacency = transform(adjacency, edges, V);
-    result.cost  = calculate_cost(result.adjacency);
-
-    return result;
+    return make_pair(true, transform(adjacency, edges, V));
 }
