@@ -10,6 +10,6 @@ struct Agm {
 	vector<NodeSource> adjacency;
 };
 
-pair< bool, vector<NodeSource>> agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval, clock_t start_time, int max_time);
+pair< bool, vector<NodeSource> > agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval, clock_t start_time, int max_time);
 
 #endif /* grasp_hpp */

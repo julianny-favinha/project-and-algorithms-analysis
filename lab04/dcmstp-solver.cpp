@@ -107,9 +107,9 @@ vector<float> update_lambdas(vector<float> lambdas, vector<NodeSource> dual, flo
 }
 
 // relaxação lagrangiana / algoritmo do subgradiente
-void lagrangean_relaxation(Graph g) {
-	vector<NodeSource> adjacency = g.adjacency;
-	vector<float> lambdas = first_lambda(g.V);
+void lagrangean_relaxation(Graph *g) {
+	vector<NodeSource> adjacency = g->adjacency;
+	vector<float> lambdas = first_lambda(g->V);
 	int no_progress = 0;
 
 	while (stop_subgradient() == false) {
@@ -143,7 +143,7 @@ void lagrangean_relaxation(Graph g) {
 					best_agm = primal_agm;
 				}
 			} else {
-				pair< bool, vector<NodeSource> > result_primal = agm_with_degree_restriction(g.V, g.E, adjacency_with_lambdas, start_time, max_time);
+				pair< bool, vector<NodeSource> > result_primal = agm_with_degree_restriction(g->V, g->E, adjacency_with_lambdas, start_time, max_time);
 
 				if (result_primal.first == true) {
 					vector<NodeSource> primal_agm_with_lambdas = result_primal.second;
@@ -196,13 +196,13 @@ void lagrangean_relaxation(Graph g) {
 	}
 }
 
-void grasp(Graph g) {
-	for (int i = 0; i < g.E * 10; i++) {
+void grasp(Graph *g) {
+	for (int i = 0; i < g->E * 10; i++) {
 		if (time_expired(start_time, max_time)) {
         	break;
     	}
 
-		pair< bool, vector<NodeSource> > result = agm_grasp(g.V, g.E, g.adjacency, 0.01, start_time, max_time);
+		pair< bool, vector<NodeSource> > result = agm_grasp(g->V, g->E, g->adjacency, 0.01, start_time, max_time);
 
 		if (result.first == true) {
 			float cost = calculate_cost(result.second);
@@ -228,10 +228,10 @@ int main(int argc, char *argv[]) {
 	max_time = time;
 
 	if (string(method) == "l") {
-		lagrangean_relaxation(g);
+		lagrangean_relaxation(&g);
 		printf("%s,%.4f,%.4f\n", file_name, best_dual, best_primal);
 	} else {
-		grasp(g);
+		grasp(&g);
 		printf("%s,%.4f\n", file_name, best_primal);
 	}
 

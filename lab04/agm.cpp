@@ -111,6 +111,7 @@ int sum_degrees(vector<NodeSource> adjacency, vector<int> nodes) {
 }
 
 // arvore geradora minima com restricao de grau dos vertices
+// se o primeiro elemento da saida for false, então não é uma solução confiavel
 pair< bool, vector<NodeSource> > agm_with_degree_restriction(int V, int E, vector<NodeSource> adjacency, clock_t start_time, int max_time) {
     vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
     vector<int> degree(V, 0);

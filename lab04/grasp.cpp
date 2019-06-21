@@ -2,7 +2,7 @@
 
 // arvore geradora minima com restricao de grau dos vertices
 // seleciona randomicamente um set de arestas
-pair< bool, vector<NodeSource>> agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval, clock_t start_time, int max_time) {
+pair< bool, vector<NodeSource> > agm_grasp(int V, int E, vector<NodeSource> adjacency, float interval, clock_t start_time, int max_time) {
     vector< pair< pair<int, int>, float > > adjacency_edges = create_adjacency_edges(adjacency);
     sort(adjacency_edges.begin(), adjacency_edges.end(), sort_cost_ascending);
 
