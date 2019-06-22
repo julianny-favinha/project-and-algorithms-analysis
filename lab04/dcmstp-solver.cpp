@@ -235,9 +235,9 @@ int main(int argc, char *argv[]) {
 		printf("%s,%.4f\n", file_name, best_primal);
 	}
 
-	clock_t finish_time = clock();
-	double total_time_execution = ((finish_time - start_time) / (float)CLOCKS_PER_SEC);
-	printf("%.2f\n", total_time_execution);
+   // clock_t finish_time = clock();
+   // double total_time_execution = ((finish_time - start_time) / (float)CLOCKS_PER_SEC);
+   // printf("%.2f\n", total_time_execution);
 
 	save_output(file_name, best_agm);
 
