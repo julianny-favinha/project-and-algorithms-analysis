@@ -11,6 +11,7 @@
 ## Lab 2
 
 Run on Gnumeric
+
 Run on Julia
 
 
