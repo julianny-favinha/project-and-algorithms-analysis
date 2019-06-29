@@ -6,6 +6,7 @@
 #### Lab 1
 
 `$ make`
+
 `$ /bnb-fs instances/i30 params/param`
 
 #### Lab 2
@@ -13,6 +14,8 @@
 Run on Gnumeric
 
 Run on Julia
+
+`julia ss2.jl 3 300`
 
 
 #### Lab 3
